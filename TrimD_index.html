@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrimD — Book. Queue. Cut. Go.</title>
+<meta name="description" content="TrimD barber appointment and live queue management">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f6fa;color:#172033}
+header{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#111827,#25344e);color:#fff;box-shadow:0 2px 12px #0002}
+.nav{max-width:1200px;margin:auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:24px;font-weight:900;letter-spacing:1px}.logo span{color:#f59e0b}
+nav a{color:#fff;text-decoration:none;margin-left:18px;font-size:14px}
+.hero{background:#111827;color:#fff;text-align:center;padding:70px 18px 64px}
+.hero h1{font-size:42px;margin:0 0 12px}.hero p{color:#cbd5e1;margin:0 0 24px}
+.btn{border:0;border-radius:9px;padding:12px 18px;background:#f59e0b;color:#111827;font-weight:800;cursor:pointer}
+.btn:hover{filter:brightness(.95)}.btn.secondary{background:#e8edf5}.btn.danger{background:#fee2e2;color:#991b1b}
+.container{max-width:1200px;margin:auto;padding:20px 16px}
+.card{background:#fff;border:1px solid #e5e9ef;border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 4px 20px #0f172a0a}
+h2{margin:0 0 16px;font-size:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.shop{border:1px solid #e5e7eb;border-radius:14px;padding:16px}
+.shop h3{margin:7px 0}.rating{color:#f59e0b}.tag{display:inline-block;background:#ecfdf5;color:#047857;border-radius:20px;padding:5px 9px;font-size:11px}
+.shop p{font-size:13px;color:#64748b}.shop .btn{width:100%;margin-top:5px}
+form{display:grid;gap:11px}
+input,select{width:100%;padding:13px;border:1px solid #d8dee8;border-radius:9px;background:#fff;font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.queue-row{display:grid;grid-template-columns:90px 1fr 110px 110px;gap:10px;align-items:center;border-bottom:1px solid #edf0f4;padding:12px 0}
+.token{font-size:20px;font-weight:900;color:#f59e0b}.muted{color:#64748b;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:#f8fafc;border-radius:12px;padding:15px}.stat b{font-size:25px;display:block}
+.admin{display:none}.admin.open{display:block}
+.notice{padding:12px;border-radius:10px;background:#ecfdf5;color:#166534;display:none;margin-top:10px}
+.notice.show{display:block}
+footer{text-align:center;padding:28px;color:#64748b}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:50;padding:18px}
+.modal.open{display:flex}.modal-box{background:#fff;border-radius:18px;padding:22px;max-width:500px;width:100%}
+.small{font-size:12px;color:#64748b}
+@media(max-width:750px){
+ nav a{margin-left:8px;font-size:11px}.hero h1{font-size:31px}
+ .grid3,.two,.stats{grid-template-columns:1fr}.queue-row{grid-template-columns:65px 1fr}
+ .queue-row .hide-mobile{display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo">Trim<span>D</span></div>
+    <nav><a href="#shops">Shops</a><a href="#book">Book</a><a href="#queue">Live Queue</a><a href="#admin">Admin</a></nav>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Book. Queue. Cut. Go.</h1>
+  <p>Book your barber appointment before you arrive and spend less time waiting.</p>
+  <button class="btn" onclick="document.getElementById('book').scrollIntoView()">Find a Barber</button>
+</section>
+
+<main class="container">
+
+<section class="card" id="shops">
+<h2>Nearby Barber Shops</h2>
+<div class="grid3">
+  <div class="shop">
+    <span class="tag">Open</span><h3>AD Classic Barbers</h3>
+    <div class="rating">★ 4.8 · 0.8 km</div><p>Haircut · Beard · Haircut + Beard</p>
+    <button class="btn" onclick="chooseShop('AD Classic Barbers')">Book Now</button>
+  </div>
+  <div class="shop">
+    <span class="tag">Open</span><h3>Urban Cut Studio</h3>
+    <div class="rating">★ 4.7 · 1.4 km</div><p>Haircut · Styling · Beard</p>
+    <button class="btn" onclick="chooseShop('Urban Cut Studio')">Book Now</button>
+  </div>
+  <div class="shop">
+    <span class="tag">Open</span><h3>Gentlemen's Point</h3>
+    <div class="rating">★ 4.9 · 2.1 km</div><p>Haircut · Beard · Facial</p>
+    <button class="btn" onclick="chooseShop('Gentlemen\\'s Point')">Book Now</button>
+  </div>
+</div>
+</section>
+
+<section class="card" id="book">
+<h2>Book an Appointment</h2>
+<form id="bookingForm">
+  <input id="name" required placeholder="Your name">
+  <input id="mobile" required inputmode="numeric" maxlength="10" placeholder="Mobile number (10 digits)">
+  <div class="two">
+    <select id="shop" required><option value="">Select barber shop</option><option>AD Classic Barbers</option><option>Urban Cut Studio</option><option>Gentlemen's Point</option></select>
+    <select id="service" required><option value="">Select service</option><option>Haircut</option><option>Beard</option><option>Haircut + Beard</option><option>Styling</option><option>Facial</option></select>
+  </div>
+  <div class="two">
+    <select id="barber" required><option value="">Select barber</option><option>Any available barber</option><option>Rahul</option><option>Amit</option><option>Vikram</option></select>
+    <select id="slot" required><option value="">Select time slot</option><option>10:00 AM</option><option>10:30 AM</option><option>11:00 AM</option><option>11:30 AM</option><option>12:00 PM</option><option>12:30 PM</option><option>01:00 PM</option><option>04:00 PM</option><option>04:30 PM</option><option>05:00 PM</option><option>05:30 PM</option><option>06:00 PM</option><option>06:30 PM</option><option>07:00 PM</option><option>07:30 PM</option><option>08:00 PM</option><option>08:30 PM</option></select>
+  </div>
+  <button class="btn" type="submit">Confirm Appointment & WhatsApp</button>
+</form>
+<div id="success" class="notice"></div>
+<p class="small">After confirmation, WhatsApp will open with the booking details. The customer can send the message to the shop.</p>
+</section>
+
+<section class="card" id="queue">
+<h2>Live Queue</h2>
+<div id="queueList"><p class="muted">No bookings yet.</p></div>
+<p class="muted">Estimated waiting: <b id="waitTime">5 minutes</b></p>
+</section>
+
+<section class="card" id="admin">
+<h2>Barber Dashboard</h2>
+<p class="muted">Manage today's demo bookings on this device.</p>
+<div class="stats">
+  <div class="stat"><span class="muted">Total</span><b id="total">0</b></div>
+  <div class="stat"><span class="muted">Waiting</span><b id="waiting">0</b></div>
+  <div class="stat"><span class="muted">In Service</span><b id="inService">0</b></div>
+  <div class="stat"><span class="muted">Completed</span><b id="completed">0</b></div>
+</div>
+<br>
+<div id="adminQueue"></div>
+<button class="btn" onclick="startNext()">▶ Start Next</button>
+<button class="btn secondary" onclick="finishCurrent()">✓ Finish Current</button>
+<button class="btn secondary" onclick="resetDemo()">Reset Demo</button>
+</section>
+
+<section class="card">
+<h2>Admin Settings</h2>
+<p class="muted">For WhatsApp booking, replace the number below with the shop's WhatsApp number including country code.</p>
+<input id="waNumber" value="91XXXXXXXXXX" placeholder="Example: 919876543210">
+<button class="btn" style="margin-top:10px" onclick="saveSettings()">Save WhatsApp Number</button>
+<p id="settingsMsg" class="small"></p>
+</section>
+
+</main>
+
+<footer>© 2026 TrimD · Book · Queue · Cut · Go</footer>
+
+<div class="modal" id="tokenModal">
+ <div class="modal-box">
+   <h2>Appointment Confirmed 🎉</h2>
+   <p>Your token number is:</p>
+   <div id="modalToken" class="token" style="font-size:40px"></div>
+   <p id="modalDetails"></p>
+   <button class="btn" onclick="sendLastWhatsApp()">Open WhatsApp</button>
+   <button class="btn secondary" onclick="closeModal()">Close</button>
+ </div>
+</div>
+
+<script>
+/*
+ IMPORTANT:
+ Set your real WhatsApp number in the Admin Settings box.
+ Example India: 919876543210
+ Do NOT put +, spaces or dashes.
+*/
+
+const DEFAULT_WA = "91XXXXXXXXXX";
+let bookings = JSON.parse(localStorage.getItem("trimd_bookings") || "[]");
+let current = JSON.parse(localStorage.getItem("trimd_current") || "null");
+let lastBooking = null;
+
+function save(){
+  localStorage.setItem("trimd_bookings", JSON.stringify(bookings));
+  localStorage.setItem("trimd_current", JSON.stringify(current));
+  render();
+}
+
+function chooseShop(shop){
+  document.getElementById("shop").value=shop;
+  document.getElementById("book").scrollIntoView({behavior:"smooth"});
+}
+
+function nextToken(){
+  const nums=bookings.map(x=>parseInt(x.token.replace("T-",""))||0);
+  return "T-"+String((Math.max(0,...nums)+1)).padStart(3,"0");
+}
+
+document.getElementById("bookingForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  const name=document.getElementById("name").value.trim();
+  const mobile=document.getElementById("mobile").value.trim();
+  if(!/^[0-9]{10}$/.test(mobile)){alert("Please enter a valid 10-digit mobile number.");return;}
+
+  const b={
+    id:Date.now(),
+    token:nextToken(),
+    name,mobile,
+    shop:document.getElementById("shop").value,
+    service:document.getElementById("service").value,
+    barber:document.getElementById("barber").value,
+    slot:document.getElementById("slot").value,
+    status:"Waiting",
+    created:new Date().toLocaleString()
+  };
+  bookings.push(b); lastBooking=b; save();
+
+  document.getElementById("success").textContent="Booking created: "+b.token+". WhatsApp is ready.";
+  document.getElementById("success").classList.add("show");
+  document.getElementById("modalToken").textContent=b.token;
+  document.getElementById("modalDetails").innerHTML="<b>"+b.name+"</b><br>"+b.shop+" · "+b.service+"<br>"+b.slot+" · "+b.barber;
+  document.getElementById("tokenModal").classList.add("open");
+  this.reset();
+});
+
+function whatsappNumber(){
+  return localStorage.getItem("trimd_wa") || DEFAULT_WA;
+}
+
+function whatsappMessage(b){
+  return `Hello TrimD 👋
+
+I want to confirm my barber appointment.
+
+🎟 Token: ${b.token}
+👤 Name: ${b.name}
+📱 Mobile: ${b.mobile}
+💈 Shop: ${b.shop}
+✂️ Service: ${b.service}
+💇 Barber: ${b.barber}
+⏰ Time: ${b.slot}
+
+Please confirm my appointment.`;
+}
+
+function sendLastWhatsApp(){
+  if(!lastBooking)return;
+  const n=whatsappNumber().replace(/[^0-9]/g,"");
+  if(n.includes("X") || n.length<10){
+    alert("Please save the real WhatsApp number first in Admin Settings.");
+    closeModal();
+    document.getElementById("waNumber").focus();
+    return;
+  }
+  window.open("https://wa.me/"+n+"?text="+encodeURIComponent(whatsappMessage(lastBooking)),"_blank");
+}
+
+function closeModal(){document.getElementById("tokenModal").classList.remove("open");}
+
+function startNext(){
+  if(current){alert("A booking is already in service.");return;}
+  const b=bookings.find(x=>x.status==="Waiting");
+  if(!b){alert("No waiting bookings.");return;}
+  b.status="In Service"; current=b.id; save();
+}
+
+function finishCurrent(){
+  if(!current){alert("No booking is currently in service.");return;}
+  const b=bookings.find(x=>x.id===current);
+  if(b)b.status="Completed";
+  current=null; save();
+}
+
+function markWaiting(id){
+  const b=bookings.find(x=>x.id===id);
+  if(b)b.status="Waiting";
+  save();
+}
+function cancelBooking(id){
+  const b=bookings.find(x=>x.id===id);
+  if(b)b.status="Cancelled";
+  if(current===id)current=null;
+  save();
+}
+
+function resetDemo(){
+  if(confirm("Delete all demo bookings from this device?")){
+    bookings=[];current=null;lastBooking=null;save();
+  }
+}
+
+function saveSettings(){
+  const n=document.getElementById("waNumber").value.trim().replace(/[^0-9]/g,"");
+  if(n.length<10){alert("Enter a valid WhatsApp number with country code.");return;}
+  localStorage.setItem("trimd_wa",n);
+  document.getElementById("settingsMsg").textContent="WhatsApp number saved successfully.";
+}
+
+function render(){
+  const q=document.getElementById("queueList");
+  const active=bookings.filter(x=>x.status==="Waiting"||x.status==="In Service");
+  if(!active.length) q.innerHTML='<p class="muted">No bookings yet.</p>';
+  else q.innerHTML=active.map(x=>`
+    <div class="queue-row">
+      <div class="token">${x.token}</div>
+      <div><b>${escapeHtml(x.name)}</b><br><span class="muted">${escapeHtml(x.service)} · ${escapeHtml(x.slot)}</span></div>
+      <div class="hide-mobile">${x.status}</div>
+      <div class="hide-mobile">${escapeHtml(x.barber)}</div>
+    </div>`).join("");
+
+  const aq=document.getElementById("adminQueue");
+  aq.innerHTML=bookings.length?bookings.slice().reverse().map(x=>`
+    <div class="queue-row">
+      <div class="token">${x.token}</div>
+      <div><b>${escapeHtml(x.name)}</b><br><span class="muted">${escapeHtml(x.shop)} · ${escapeHtml(x.service)} · ${escapeHtml(x.slot)}</span></div>
+      <div>${x.status}</div>
+      <div>
+        ${x.status==="Cancelled"||x.status==="Completed"?"":"<button class='btn secondary' onclick='cancelBooking("+x.id+")'>Cancel</button>"}
+      </div>
+    </div>`).join(""):"<p class='muted'>No bookings.</p>";
+
+  document.getElementById("total").textContent=bookings.length;
+  document.getElementById("waiting").textContent=bookings.filter(x=>x.status==="Waiting").length;
+  document.getElementById("inService").textContent=bookings.filter(x=>x.status==="In Service").length;
+  document.getElementById("completed").textContent=bookings.filter(x=>x.status==="Completed").length;
+  document.getElementById("waitTime").textContent=Math.max(5,bookings.filter(x=>x.status==="Waiting").length*10)+" minutes";
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+document.getElementById("waNumber").value=localStorage.getItem("trimd_wa")||DEFAULT_WA;
+render();
+</script>
+</body>
+</html>
