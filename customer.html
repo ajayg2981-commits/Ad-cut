@@ -1,31 +1,141 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TrimD Customer</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{font-family:Arial;margin:0;background:#f4f6f9;color:#172033}.wrap{max-width:700px;margin:auto;padding:18px}
+body{font-family:Arial;margin:0;background:#f4f6f9;color:#172033}
+.wrap{max-width:700px;margin:auto;padding:18px}
 .card{background:#fff;border-radius:16px;padding:18px;margin:12px 0;box-shadow:0 2px 12px #0001}
-input,select{width:100%;box-sizing:border-box;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:9px}button{padding:12px 16px;border:0;border-radius:9px;background:#f5a400;font-weight:bold;margin-top:8px}
-.shop{border:1px solid #e5e8ed;border-radius:12px;padding:14px;margin:10px 0}.muted{color:#737d8c;font-size:13px}.ok{background:#e7f7ed;padding:12px;border-radius:9px}
-</style></head><body><div class="wrap">
-<div class="card"><h1>TrimD Customer</h1><p class="muted">Nearby shops within 10 km will appear here.</p>
-<input id="name" placeholder="Your name"><input id="mobile" placeholder="Mobile number" inputmode="tel">
-<button onclick="getLocation()">📍 Find Nearby Shops</button><div id="shops"></div></div>
+input,select{width:100%;box-sizing:border-box;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:9px}
+button{padding:12px 16px;border:0;border-radius:9px;background:#f5a400;font-weight:bold;margin-top:8px}
+.shop{border:1px solid #e5e8ed;border-radius:12px;padding:14px;margin:10px 0}
+.muted{color:#737d8c;font-size:13px}
+.ok{background:#e7f7ed;padding:12px;border-radius:9px}
+.error{background:#ffe8e8;color:#a00000;padding:12px;border-radius:9px;word-break:break-word}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card"><h1>TrimD Customer</h1>
+<p class="muted">Nearby shops within 10 km will appear here.</p>
+<input id="name" placeholder="Your name">
+<input id="mobile" placeholder="Mobile number" inputmode="tel">
+<button onclick="getLocation()">📍 Find Nearby Shops</button>
+<div id="shops"></div></div>
+
 <div class="card"><h2>Booking</h2>
 <select id="shop"><option value="">Select shop</option></select>
 <select id="service"><option value="">Select service</option></select>
 <select id="barber"><option value="">Select barber</option></select>
 <input id="time" placeholder="Appointment time e.g. 6:00 PM">
-<button onclick="requestBooking()">Request Booking</button><div id="msg"></div></div>
-<div class="card"><h2>My Notifications</h2><div id="notifications" class="muted">Login/notification setup will appear here.</div></div>
+<button onclick="requestBooking()">Request Booking</button>
+<div id="msg"></div></div>
+
+<div class="card"><h2>My Notifications</h2>
+<div id="notifications" class="muted">Login/notification setup will appear here.</div></div>
 </div>
+
 <script>
-const URL="https://bjebexsledooklafvfqb.supabase.co",KEY="sb_publishable_dgLMU1U1cG81VcG_8KeuPQ_juJ-O626";
-const db=supabase.createClient(URL,KEY);let shops=[],lat=null,lon=null;
-async function getLocation(){navigator.geolocation.getCurrentPosition(async p=>{lat=p.coords.latitude;lon=p.coords.longitude;await loadShops()},()=>loadShops());}
-async function loadShops(){let q=db.from('trimd_shops').select('*').eq('is_approved',true);let r=await q;shops=r.data||[];let e=document.getElementById('shops');e.innerHTML=shops.map(s=>`<div class="shop"><b>${s.name}</b><div class="muted">${s.address||''}</div><button onclick="choose('${s.id}')">Book Here</button></div>`).join('')||'<div class="muted">No approved shops found.</div>';document.getElementById('shop').innerHTML='<option value="">Select shop</option>'+shops.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');}
-async function choose(id){document.getElementById('shop').value=id;await loadRelated(id);}
-async function loadRelated(id){let s=await db.from('trimd_services').select('*').eq('shop_id',id);document.getElementById('service').innerHTML='<option value="">Service</option>'+(s.data||[]).map(x=>`<option value="${x.id}">${x.name}${x.price?' - ₹'+x.price:''}</option>`).join('');let b=await db.from('trimd_barbers').select('*').eq('shop_id',id);document.getElementById('barber').innerHTML='<option value="">Barber</option>'+(b.data||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');}
-document.getElementById('shop').onchange=e=>e.target.value&&loadRelated(e.target.value);
-async function requestBooking(){let shop_id=shop.value;if(!name.value||!mobile.value||!shop_id||!service.value||!barber.value||!time.value){msg.innerHTML='<div class="muted">Please fill all fields.</div>';return}let r=await db.from('trimd_bookings').insert({shop_id,service_id:service.value,barber_id:barber.value,customer_name:name.value,customer_mobile:mobile.value,appointment_time:time.value,status:'requested'}).select().single();msg.innerHTML=r.error?'<div class="muted">'+r.error.message+'</div>':'<div class="ok">Booking request sent. Waiting for shop confirmation.</div>';}
-</script></body></html>
+const URL="https://bjebexsledooklafvfqb.supabase.co";
+const KEY="sb_publishable_dgLMU1U1cG81VcG_8KeuPQ_juJ-O626";
+const db=supabase.createClient(URL,KEY);
+let shops=[],lat=null,lon=null;
+
+async function getLocation(){
+  navigator.geolocation.getCurrentPosition(
+    async p=>{lat=p.coords.latitude;lon=p.coords.longitude;await loadShops();},
+    async ()=>{await loadShops();}
+  );
+}
+
+async function loadShops(){
+  const {data,error}=await db.from('trimd_shops').select('*').eq('is_approved',true);
+  const e=document.getElementById('shops');
+
+  if(error){
+    console.error("Shop loading error:",error);
+    e.innerHTML='<div class="error">Shop loading error: '+error.message+'</div>';
+    document.getElementById('shop').innerHTML='<option value="">Select shop</option>';
+    return;
+  }
+
+  shops=data||[];
+
+  if(shops.length===0){
+    e.innerHTML='<div class="muted">No approved shops found.</div>';
+  }else{
+    e.innerHTML=shops.map(s=>
+      `<div class="shop"><b>${s.name||'Unnamed Shop'}</b>
+      <div class="muted">${s.address||''}</div>
+      <button onclick="choose('${s.id}')">Book Here</button></div>`
+    ).join('');
+  }
+
+  document.getElementById('shop').innerHTML=
+    '<option value="">Select shop</option>'+
+    shops.map(s=>`<option value="${s.id}">${s.name||'Unnamed Shop'}</option>`).join('');
+}
+
+async function choose(id){
+  document.getElementById('shop').value=id;
+  await loadRelated(id);
+}
+
+async function loadRelated(id){
+  const {data:s,error:serviceError}=await db.from('trimd_services').select('*').eq('shop_id',id);
+
+  if(serviceError){
+    console.error("Service loading error:",serviceError);
+    document.getElementById('service').innerHTML='<option value="">Service loading error</option>';
+  }else{
+    document.getElementById('service').innerHTML=
+      '<option value="">Service</option>'+
+      (s||[]).map(x=>`<option value="${x.id}">${x.name}${x.price?' - ₹'+x.price:''}</option>`).join('');
+  }
+
+  const {data:b,error:barberError}=await db.from('trimd_barbers').select('*').eq('shop_id',id);
+
+  if(barberError){
+    console.error("Barber loading error:",barberError);
+    document.getElementById('barber').innerHTML='<option value="">Barber loading error</option>';
+  }else{
+    document.getElementById('barber').innerHTML=
+      '<option value="">Barber</option>'+
+      (b||[]).map(x=>`<option value="${x.id}">${x.name}</option>`).join('');
+  }
+}
+
+document.getElementById('shop').onchange=e=>{
+  if(e.target.value) loadRelated(e.target.value);
+};
+
+async function requestBooking(){
+  const shop_id=document.getElementById('shop').value;
+  const customerName=document.getElementById('name').value;
+  const customerMobile=document.getElementById('mobile').value;
+  const serviceId=document.getElementById('service').value;
+  const barberId=document.getElementById('barber').value;
+  const appointmentTime=document.getElementById('time').value;
+  const msg=document.getElementById('msg');
+
+  if(!customerName||!customerMobile||!shop_id||!serviceId||!barberId||!appointmentTime){
+    msg.innerHTML='<div class="muted">Please fill all fields.</div>';
+    return;
+  }
+
+  const {error}=await db.from('trimd_bookings').insert({
+    shop_id:shop_id,service_id:serviceId,barber_id:barberId,
+    customer_name:customerName,customer_mobile:customerMobile,
+    appointment_time:appointmentTime,status:'requested'
+  }).select().single();
+
+  msg.innerHTML=error
+    ? '<div class="error">'+error.message+'</div>'
+    : '<div class="ok">Booking request sent. Waiting for shop confirmation.</div>';
+}
+</script>
+</body>
+</html>
