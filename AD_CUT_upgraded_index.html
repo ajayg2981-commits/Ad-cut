@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AD CUT — Book. Queue. Cut. Go.</title>
+<meta name="description" content="AD CUT barber appointment and live queue management platform">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f6fa;color:#172033}
+header{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#111827,#26354d);color:#fff;box-shadow:0 2px 12px #0002}
+.nav{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:16px 20px}
+.logo{font-size:23px;font-weight:900;letter-spacing:1px}.logo span{color:#f59e0b}
+nav a{color:#fff;text-decoration:none;margin-left:20px;font-size:14px}
+.hero{background:#111827;color:#fff;text-align:center;padding:70px 20px 78px}
+.hero h1{font-size:42px;margin:0 0 12px}.hero p{color:#cbd5e1;font-size:16px}
+.btn{border:0;border-radius:9px;background:#f59e0b;color:#111827;font-weight:800;padding:13px 20px;cursor:pointer}
+.btn:hover{filter:brightness(.95)}.btn.secondary{background:#e8edf5;color:#172033}.btn.danger{background:#fee2e2;color:#991b1b}
+.container{max-width:1200px;margin:auto;padding:22px 16px}
+.card{background:#fff;border:1px solid #e5e9f0;border-radius:18px;padding:20px;box-shadow:0 6px 22px #1820330d;margin-bottom:20px}
+h2{margin:0 0 16px;font-size:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.shop{border:1px solid #e5e7eb;border-radius:14px;padding:16px}
+.shop h3{margin:8px 0}.rating{color:#555;font-size:14px}.tag{display:inline-block;padding:4px 9px;border-radius:20px;background:#ecfdf5;color:#047857;font-size:11px}
+.shop p{color:#6b7280;font-size:13px;min-height:34px}
+form{display:grid;gap:11px}
+input,select{width:100%;padding:13px;border:1px solid #d8dee8;border-radius:9px;background:#fff;font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.queue-row{display:grid;grid-template-columns:90px 1fr 110px;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #edf0f4}
+.token{font-weight:900;color:#f59e0b;font-size:19px}.status{text-align:right;font-weight:700;font-size:13px}
+.empty{color:#64748b;padding:12px 0}.success{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:16px;border-radius:12px;margin-bottom:15px}
+.confirm-token{font-size:34px;font-weight:900;margin:8px 0}
+.dashboard{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.stats{display:flex;gap:12px;flex-wrap:wrap}.stat{flex:1;min-width:130px;background:#f8fafc;border-radius:12px;padding:14px}.stat b{display:block;font-size:25px}
+footer{text-align:center;padding:28px;color:#64748b}
+@media(max-width:750px){.grid3,.dashboard{grid-template-columns:1fr}.two{grid-template-columns:1fr}.hero h1{font-size:32px}nav a{margin-left:8px;font-size:12px}.queue-row{grid-template-columns:70px 1fr 80px}}
+</style>
+</head>
+<body>
+<header>
+<div class="nav">
+<div class="logo">AD<span>CUT</span></div>
+<nav><a href="#shops">Shops</a><a href="#book">Book</a><a href="#queue">Live Queue</a><a href="#dashboard">Barber</a></nav>
+</div>
+</header>
+
+<section class="hero">
+<h1>Book. Queue. Cut. Go.</h1>
+<p>Book your barber appointment before you arrive and spend less time waiting.</p>
+<button class="btn" onclick="document.getElementById('book').scrollIntoView()">Find a Barber</button>
+</section>
+
+<main class="container">
+<section class="card" id="shops">
+<h2>Nearby Barber Shops</h2>
+<div class="grid3">
+<div class="shop"><span class="tag">Open</span><h3>AD Classic Barbers</h3><div class="rating">⭐ 4.8 · 0.8 km</div><p>Haircut · Beard · Haircut + Beard</p><button class="btn" onclick="chooseShop('AD Classic Barbers')">Book Now</button></div>
+<div class="shop"><span class="tag">Open</span><h3>Urban Cut Studio</h3><div class="rating">⭐ 4.7 · 1.4 km</div><p>Haircut · Styling · Beard</p><button class="btn" onclick="chooseShop('Urban Cut Studio')">Book Now</button></div>
+<div class="shop"><span class="tag">Open</span><h3>Gentlemen's Point</h3><div class="rating">⭐ 4.9 · 2.1 km</div><p>Haircut · Beard · Facial</p><button class="btn" onclick="chooseShop('Gentlemen\\'s Point')">Book Now</button></div>
+</div>
+</section>
+
+<section class="card" id="book">
+<h2>Book an Appointment</h2>
+<div id="confirmation"></div>
+<form id="bookingForm">
+<input id="name" required placeholder="Your name">
+<input id="phone" required inputmode="tel" pattern="[0-9]{10}" maxlength="10" placeholder="Mobile number (10 digits)">
+<div class="two">
+<select id="shop" required><option value="">Select barber shop</option><option>AD Classic Barbers</option><option>Urban Cut Studio</option><option>Gentlemen's Point</option></select>
+<select id="service" required><option value="">Select service</option><option>Haircut</option><option>Beard</option><option>Haircut + Beard</option><option>Styling</option><option>Facial</option></select>
+</div>
+<div class="two">
+<select id="barber" required><option value="">Select barber</option><option>Any available barber</option><option>Rahul</option><option>Mohit</option><option>Arjun</option></select>
+<select id="time" required><option value="">Select time slot</option><option>10:00 AM</option><option>11:00 AM</option><option>12:00 PM</option><option>1:00 PM</option><option>3:00 PM</option><option>4:00 PM</option><option>5:00 PM</option><option>6:00 PM</option><option>7:00 PM</option></select>
+</div>
+<button class="btn" type="submit">Confirm Appointment</button>
+</form>
+</section>
+
+<section class="card" id="queue">
+<h2>Live Queue</h2>
+<div id="queueList"></div>
+<div id="waitText" class="empty"></div>
+</section>
+
+<section class="card" id="dashboard">
+<h2>Barber Dashboard</h2>
+<p style="color:#64748b">Manage today's demo bookings from this device.</p>
+<div class="stats">
+<div class="stat"><small>Total</small><b id="totalStat">0</b></div>
+<div class="stat"><small>Waiting</small><b id="waitingStat">0</b></div>
+<div class="stat"><small>In service</small><b id="serviceStat">0</b></div>
+</div>
+<br>
+<div class="dashboard">
+<div>
+<h3>Today's Queue</h3>
+<div id="dashboardQueue"></div>
+</div>
+<div>
+<h3>Queue Controls</h3>
+<button class="btn" onclick="startNext()">▶ Start Next</button>
+<button class="btn secondary" onclick="finishCurrent()">✓ Finish Current</button>
+<button class="btn secondary" onclick="resetDemo()">Reset Demo</button>
+</div>
+</div>
+</section>
+</main>
+
+<footer>© 2026 AD CUT · Book · Queue · Cut · Go</footer>
+
+<script>
+const KEY='adcut_bookings_v2';
+let bookings=JSON.parse(localStorage.getItem(KEY)||'[]');
+
+function save(){localStorage.setItem(KEY,JSON.stringify(bookings));render();}
+function nextToken(){return 'AD-'+String(bookings.length+1).padStart(2,'0')}
+function chooseShop(shop){document.getElementById('shop').value=shop;document.getElementById('book').scrollIntoView({behavior:'smooth'});}
+document.getElementById('bookingForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const booking={
+  id:Date.now(),token:nextToken(),
+  name:document.getElementById('name').value.trim(),
+  phone:document.getElementById('phone').value.trim(),
+  shop:document.getElementById('shop').value,
+  service:document.getElementById('service').value,
+  barber:document.getElementById('barber').value,
+  time:document.getElementById('time').value,
+  status:'Waiting'
+ };
+ bookings.push(booking);save();e.target.reset();
+ document.getElementById('confirmation').innerHTML=
+ `<div class="success"><b>Appointment confirmed!</b><div class="confirm-token">${booking.token}</div>
+ ${booking.name}, your appointment is booked at <b>${booking.shop}</b> for <b>${booking.time}</b>.<br>
+ Service: ${booking.service} · Barber: ${booking.barber}<br><small>Keep your token for queue tracking.</small></div>`;
+ document.getElementById('confirmation').scrollIntoView({behavior:'smooth'});
+});
+
+function startNext(){
+ const current=bookings.find(x=>x.status==='In service');
+ if(current)return alert('A customer is already in service.');
+ const next=bookings.find(x=>x.status==='Waiting');
+ if(!next)return alert('No waiting customer.');
+ next.status='In service';save();
+}
+function finishCurrent(){
+ const current=bookings.find(x=>x.status==='In service');
+ if(!current)return alert('No customer is currently in service.');
+ current.status='Completed';save();
+}
+function resetDemo(){
+ if(confirm('Reset all demo bookings?')){bookings=[];save();document.getElementById('confirmation').innerHTML='';}
+}
+function render(){
+ const q=document.getElementById('queueList'),dq=document.getElementById('dashboardQueue');
+ const active=bookings.filter(x=>x.status!=='Completed');
+ if(!active.length) q.innerHTML='<div class="empty">No bookings yet</div>';
+ else q.innerHTML=active.map(x=>`<div class="queue-row"><div class="token">${x.token}</div><div><b>${escapeHtml(x.name)}</b><br><small>${escapeHtml(x.service)} · ${escapeHtml(x.time)}</small></div><div class="status">${x.status}</div></div>`).join('');
+ const waiting=bookings.filter(x=>x.status==='Waiting').length;
+ const service=bookings.filter(x=>x.status==='In service').length;
+ document.getElementById('waitText').textContent=waiting?`Estimated waiting: ${waiting*5}–${waiting*10} minutes`:'Estimated waiting: 5 minutes';
+ document.getElementById('totalStat').textContent=bookings.length;
+ document.getElementById('waitingStat').textContent=waiting;
+ document.getElementById('serviceStat').textContent=service;
+ if(!bookings.length)dq.innerHTML='<div class="empty">No bookings.</div>';
+ else dq.innerHTML=bookings.map(x=>`<div style="padding:9px 0;border-bottom:1px solid #eee"><b>${x.token}</b> · ${escapeHtml(x.name)} <span style="float:right">${x.status}</span></div>`).join('');
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+render();
+</script>
+</body>
+</html>
