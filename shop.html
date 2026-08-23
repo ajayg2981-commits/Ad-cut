@@ -22,12 +22,67 @@
 <script>
 const SUPABASE_URL="https://bjebexsledoaklfvqb.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_dgLMU1U1cG81VcG_8KeuPQ_juJ-O626";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let db=null;
+try{
+  if(!window.supabase) throw new Error("Supabase library could not load.");
+  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+}catch(e){
+  console.error(e);
+  setTimeout(()=>msg("authMsg","Supabase connection could not be initialized. Check the Supabase URL/key and internet connection.",true),0);
+}
 let user=null,shop=null;
 
-async function register(){const email=v("email"),password=v("password");if(password.length<6)return msg("authMsg","Password must be 6+ characters.",true);const {data,error}=await db.auth.signUp({email,password});if(error)return msg("authMsg",error.message,true);if(data.session){user=data.user;showRegister();}else msg("authMsg","Account created. Check email confirmation, then login.");}
-async function login(){const {data,error}=await db.auth.signInWithPassword({email:v("email"),password:v("password")});if(error)return msg("authMsg",error.message,true);user=data.user;await boot();}
-async function boot(){const r=await db.auth.getUser();user=r.data.user;if(!user)return;document.getElementById("auth").classList.add("hidden");const q=await db.from("trimd_shops").select("*").eq("owner_id",user.id).maybeSingle();if(!q.data){showRegister();return}shop=q.data;showDash();subscribe();}
+async function register(){
+  if(!db)return msg("authMsg","Database connection is not ready. Please refresh and try again.",true);
+  const email=v("email"),password=v("password");
+  if(!email)return msg("authMsg","Enter owner email.",true);
+  if(password.length<6)return msg("authMsg","Password must be 6+ characters.",true);
+  try{
+    const {data,error}=await db.auth.signUp({email,password});
+    if(error)return msg("authMsg",error.message,true);
+    if(data.session){
+      user=data.user;
+      showRegister();
+      msg("authMsg","Account created successfully.");
+    }else{
+      msg("authMsg","Account created. Check your email confirmation, then login.");
+    }
+  }catch(e){
+    console.error(e);
+    msg("authMsg","Failed to connect to Supabase. Check internet/Supabase settings.",true);
+  }
+}
+async function login(){
+  if(!db)return msg("authMsg","Database connection is not ready. Please refresh and try again.",true);
+  try{
+    const {data,error}=await db.auth.signInWithPassword({email:v("email"),password:v("password")});
+    if(error)return msg("authMsg",error.message,true);
+    user=data.user;
+    await boot();
+  }catch(e){
+    console.error(e);
+    msg("authMsg","Failed to connect to Supabase. Check internet/Supabase settings.",true);
+  }
+}
+async function boot(){
+  if(!db)return msg("authMsg","Database connection is not ready. Please refresh and try again.",true);
+  try{
+    const r=await db.auth.getUser();
+    if(r.error)return msg("authMsg",r.error.message,true);
+    user=r.data.user;
+    if(!user)return;
+    document.getElementById("auth").classList.add("hidden");
+    const q=await db.from("trimd_shops").select("*").eq("owner_id",user.id).maybeSingle();
+    if(q.error)return msg("authMsg",q.error.message,true);
+    if(!q.data){showRegister();return}
+    shop=q.data;
+    showDash();
+    subscribe();
+  }catch(e){
+    console.error(e);
+    msg("authMsg","Could not reach Supabase. Check internet and Supabase project settings.",true);
+  }
+}
 function showRegister(){document.getElementById("auth").classList.add("hidden");document.getElementById("registerCard").classList.remove("hidden");}
 function useLocation(){if(!navigator.geolocation)return msg("shopMsg","Location not supported.",true);navigator.geolocation.getCurrentPosition(p=>{vset("lat",p.coords.latitude.toFixed(7));vset("lng",p.coords.longitude.toFixed(7));msg("shopMsg","Location added.");},e=>msg("shopMsg","Please allow location permission.",true),{enableHighAccuracy:true,timeout:10000});}
 async function saveShop(){if(!user)return;const lat=parseFloat(v("lat")),lng=parseFloat(v("lng"));if(!v("shopName")||!v("wa")||!Number.isFinite(lat)||!Number.isFinite(lng))return msg("shopMsg","Shop name, WhatsApp and location are required.",true);const {data,error}=await db.from("trimd_shops").insert({owner_id:user.id,name:v("shopName"),description:v("description"),address:v("address"),city:v("city"),whatsapp:v("wa").replace(/\D/g,""),latitude:lat,longitude:lng}).select().single();if(error)return msg("shopMsg",error.message,true);shop=data;await db.from("trimd_profiles").upsert({id:user.id,role:"shop_owner"});showDash();subscribe();}
@@ -45,5 +100,5 @@ function subscribe(){db.channel("shop-live-"+shop.id).on("postgres_changes",{eve
 async function sendWA(booking,event){try{const sess=(await db.auth.getSession()).data.session;const r=await fetch(SUPABASE_URL+"/functions/v1/send-whatsapp",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_PUBLISHABLE_KEY,"Authorization":"Bearer "+(sess?.access_token||"")},body:JSON.stringify({booking_id:booking.id,event})});return await r.json();}catch(e){console.log(e)}}
 async function logout(){await db.auth.signOut();location.reload()}
 function msg(id,t,err=false){const e=document.getElementById(id);e.className=err?"notice error":"notice";e.textContent=t}function v(id){return document.getElementById(id).value.trim()}function vset(id,x){document.getElementById(id).value=x||""}function esc(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-db.auth.getSession().then(({data})=>{if(data.session)boot()});
+if(db)db.auth.getSession().then(({data})=>{if(data.session)boot()}).catch(e=>console.error(e));
 </script></body></html>
