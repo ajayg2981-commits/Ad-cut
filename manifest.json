@@ -1,0 +1,18 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "ajayg2981-commits.github",
+  "orientation": "portrait",
+  "scope": "/",
+  "short_name": "ajayg2981-commits.github",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": "trimd",
+  "description": "TrimD is a smart barber appointment and queue management app that helps customers book appointments and manage their waiting time easily.",
+  "lang": "en",
+  "categories": [
+    "beauty",
+    "lifestyle"
+  ]
+}
