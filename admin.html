@@ -1,40 +1,122 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TrimD — Admin Control</title>
+<meta name="description" content="TrimD Admin Control Panel">
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6fa;color:#111827}
-button,input,select{font:inherit}button{cursor:pointer}.hide{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6fa;color:#111827}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.hide{display:none!important}
 .side{position:fixed;left:0;top:0;bottom:0;width:240px;background:#0b1220;color:#fff;padding:20px 14px}
-.brand{font-size:22px;font-weight:900;padding:4px 8px 25px}.logo{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#f5a400;color:#111;margin-right:8px}.gold{color:#f5a400}
-.nav button{display:block;width:100%;border:0;background:transparent;color:#cbd5e1;text-align:left;padding:12px;border-radius:11px;margin:4px 0;font-weight:bold}.nav button:hover,.nav button.on{background:#ffffff15;color:white}
-.main{margin-left:240px}.top{height:68px;background:white;border-bottom:1px solid #e5e7eb;padding:0 25px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
-.wrap{padding:24px;max-width:1400px;margin:auto}.hero{background:linear-gradient(135deg,#0b1220,#263449);color:white;border-radius:22px;padding:25px;margin-bottom:18px}.hero h1{margin:6px 0;font-size:28px}.hero p{color:#cbd5e1}
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}.stat,.card{background:white;border:1px solid #e5e7eb;border-radius:18px;padding:17px;box-shadow:0 7px 25px #1118270b}.stat b{color:#64748b;font-size:12px}.stat h2{margin:7px 0 0;font-size:27px}.card{margin-bottom:18px}.head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}.muted{color:#64748b;font-size:13px}
-.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:900;background:#f5a400;color:#111}.green{background:#dcfce7;color:#166534}.red{background:#fee2e2;color:#991b1b}.blue{background:#dbeafe;color:#1d4ed8}.light{background:#eef2f7;color:#334155}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input,.toolbar select{padding:11px;border:1px solid #dbe1ea;border-radius:10px}.toolbar input{min-width:260px}
-.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:700px}.table th,.table td{text-align:left;padding:12px;border-bottom:1px solid #edf0f4;font-size:13px}.table th{font-size:10px;color:#64748b;text-transform:uppercase}.pill{padding:5px 8px;border-radius:99px;font-size:10px;font-weight:900;text-transform:uppercase}.approved{background:#dcfce7;color:#166534}.pending{background:#fff7ed;color:#9a3412}.disabled{background:#e5e7eb;color:#475569}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.activity{padding:11px 0;border-bottom:1px solid #edf0f4}
-.login{max-width:430px;margin:9vh auto;background:white;border:1px solid #e5e7eb;border-radius:22px;padding:25px;box-shadow:0 15px 45px #11182715}.login h1{text-align:center}.field{margin:12px 0}.field label{display:block;font-size:12px;font-weight:bold;margin-bottom:6px}.field input{width:100%;padding:12px;border:1px solid #d8dee8;border-radius:11px}.notice{margin-top:10px;padding:10px;border-radius:10px;background:#fee2e2;color:#991b1b;font-size:13px}
-@media(max-width:950px){.stats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}}
-@media(max-width:650px){.side{width:65px;padding:12px 7px}.brandText,.nav span{display:none}.nav button{text-align:center}.main{margin-left:65px}.wrap{padding:14px}.top{padding:0 12px}.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:span 2}}
+.brand{font-size:22px;font-weight:900;padding:4px 8px 25px}
+.logo{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#f5a400;color:#111;margin-right:8px}
+.gold{color:#f5a400}
+.nav button{display:block;width:100%;border:0;background:transparent;color:#cbd5e1;text-align:left;padding:12px;border-radius:11px;margin:4px 0;font-weight:bold}
+.nav button:hover,.nav button.on{background:#ffffff15;color:white}
+.main{margin-left:240px}
+.top{height:68px;background:white;border-bottom:1px solid #e5e7eb;padding:0 25px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.wrap{padding:24px;max-width:1400px;margin:auto}
+.hero{background:linear-gradient(135deg,#0b1220,#263449);color:white;border-radius:22px;padding:25px;margin-bottom:18px}
+.hero h1{margin:6px 0;font-size:28px}
+.hero p{color:#cbd5e1}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+.stat,.card{background:white;border:1px solid #e5e7eb;border-radius:18px;padding:17px;box-shadow:0 7px 25px #1118270b}
+.stat b{color:#64748b;font-size:12px}
+.stat h2{margin:7px 0 0;font-size:27px}
+.card{margin-bottom:18px}
+.head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}
+.muted{color:#64748b;font-size:13px}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:900;background:#f5a400;color:#111}
+.green{background:#dcfce7;color:#166534}
+.red{background:#fee2e2;color:#991b1b}
+.blue{background:#dbeafe;color:#1d4ed8}
+.light{background:#eef2f7;color:#334155}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.toolbar input,.toolbar select{padding:11px;border:1px solid #dbe1ea;border-radius:10px}
+.toolbar input{min-width:260px}
+.tablewrap{overflow:auto}
+.table{width:100%;border-collapse:collapse;min-width:700px}
+.table th,.table td{text-align:left;padding:12px;border-bottom:1px solid #edf0f4;font-size:13px}
+.table th{font-size:10px;color:#64748b;text-transform:uppercase}
+.pill{padding:5px 8px;border-radius:99px;font-size:10px;font-weight:900;text-transform:uppercase}
+.approved{background:#dcfce7;color:#166534}
+.pending{background:#fff7ed;color:#9a3412}
+.disabled{background:#e5e7eb;color:#475569}
+.waiting{background:#fff7ed;color:#9a3412}
+.confirmed{background:#dcfce7;color:#166534}
+.completed{background:#e5e7eb;color:#475569}
+.activity{padding:11px 0;border-bottom:1px solid #edf0f4}
+.empty{padding:30px;text-align:center;color:#64748b}
+.login{max-width:430px;margin:9vh auto;background:white;border:1px solid #e5e7eb;border-radius:22px;padding:25px;box-shadow:0 15px 45px #11182715}
+.login h1{text-align:center}
+.field{margin:12px 0}
+.field label{display:block;font-size:12px;font-weight:bold;margin-bottom:6px}
+.field input{width:100%;padding:12px;border:1px solid #d8dee8;border-radius:11px}
+.notice{margin-top:10px;padding:10px;border-radius:10px;background:#fee2e2;color:#991b1b;font-size:13px}
+.demo-note{margin-top:12px;padding:10px;border-radius:10px;background:#fff7ed;color:#9a3412;font-size:12px}
+@media(max-width:950px){
+.stats{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:650px){
+.side{width:65px;padding:12px 7px}
+.brandText,.nav span{display:none}
+.nav button{text-align:center}
+.main{margin-left:65px}
+.wrap{padding:14px}
+.top{padding:0 12px}
+.stats{grid-template-columns:1fr 1fr}
+.stat:last-child{grid-column:span 2}
+}
 </style>
 </head>
+
 <body>
+
 <section id="login" class="login">
-  <div class="brand" style="text-align:center"><span class="logo">✂</span><span class="brandText">Trim<span class="gold">D</span></span></div>
+  <div class="brand" style="text-align:center">
+    <span class="logo">✂</span>
+    <span class="brandText">Trim<span class="gold">D</span></span>
+  </div>
+
   <h1>Admin Control Panel</h1>
-  <p class="muted" style="text-align:center">Demo version — Supabase security will be connected later.</p>
-  <div class="field"><label>Admin Email</label><input id="email" type="email" placeholder="admin@trimd.in"></div>
-  <div class="field"><label>Password</label><input id="pass" type="password" placeholder="Password"></div>
+  <p class="muted" style="text-align:center">
+    Manage TrimD shops, bookings and customers.
+  </p>
+
+  <div class="field">
+    <label>Admin Email</label>
+    <input id="email" type="email" placeholder="admin@trimd.in">
+  </div>
+
+  <div class="field">
+    <label>Password</label>
+    <input id="pass" type="password" placeholder="Password">
+  </div>
+
   <button class="btn" style="width:100%" onclick="login()">Login</button>
+
   <div id="msg"></div>
+
+  <div class="demo-note">
+    Demo mode: Supabase authentication and live database will be connected later.
+  </div>
 </section>
 
 <div id="app" class="hide">
+
 <aside class="side">
-  <div class="brand"><span class="logo">✂</span><span class="brandText">Trim<span class="gold">D</span><small style="display:block;font-size:8px;color:#94a3b8;letter-spacing:2px">ADMIN</small></span></div>
+  <div class="brand">
+    <span class="logo">✂</span>
+    <span class="brandText">
+      Trim<span class="gold">D</span>
+      <small style="display:block;font-size:8px;color:#94a3b8;letter-spacing:2px">ADMIN</small>
+    </span>
+  </div>
+
   <div class="nav">
     <button class="on" onclick="page('dashboard',this)">📊 <span>Dashboard</span></button>
     <button onclick="page('shops',this)">🏪 <span>Shops</span></button>
@@ -42,48 +124,365 @@ button,input,select{font:inherit}button{cursor:pointer}.hide{display:none!import
     <button onclick="page('customers',this)">👥 <span>Customers</span></button>
   </div>
 </aside>
+
 <main class="main">
-<header class="top"><b id="title">Dashboard</b><button class="btn light" onclick="location.reload()">Logout</button></header>
+
+<header class="top">
+  <b id="title">Dashboard</b>
+  <button class="btn light" onclick="logout()">Logout</button>
+</header>
+
 <div class="wrap">
 
 <section id="dashboard">
-<div class="hero"><div><small class="gold">TRIMD ADMIN</small><h1>Admin Dashboard 👋</h1><p>Monitor shops, customers and bookings from one place.</p></div></div>
+
+<div class="hero">
+  <small class="gold">TRIMD ADMIN</small>
+  <h1>Admin Dashboard 👋</h1>
+  <p>Monitor shops, customers and bookings from one place.</p>
+</div>
+
 <div class="stats" id="stats"></div>
-<div class="grid"><div class="card"><div class="head"><div><h2>Recent Shops</h2><span class="muted">Latest registrations</span></div></div><div id="recentShops"></div></div><div class="card"><div class="head"><div><h2>Recent Bookings</h2><span class="muted">Latest activity</span></div></div><div id="recentBookings"></div></div></div>
+
+<div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+
+<div class="card">
+  <div class="head">
+    <div>
+      <h2>Recent Shops</h2>
+      <span class="muted">Latest registrations</span>
+    </div>
+  </div>
+  <div id="recentShops"></div>
+</div>
+
+<div class="card">
+  <div class="head">
+    <div>
+      <h2>Recent Bookings</h2>
+      <span class="muted">Latest activity</span>
+    </div>
+  </div>
+  <div id="recentBookings"></div>
+</div>
+
+</div>
 </section>
 
 <section id="shops" class="hide">
-<div class="card"><div class="head"><div><h2>Shop Management</h2><span class="muted">Approve, disable or delete unauthorized shops.</span></div></div>
-<div class="toolbar"><input id="sq" placeholder="🔎 Search shop/owner/city" oninput="renderShops()"><select id="sf" onchange="renderShops()"><option value="all">All</option><option value="approved">Approved</option><option value="pending">Pending</option><option value="disabled">Disabled</option></select></div>
-<div class="tablewrap"><table class="table"><thead><tr><th>Shop</th><th>Owner</th><th>City</th><th>Status</th><th>Bookings</th><th>Actions</th></tr></thead><tbody id="shopTable"></tbody></table></div></div>
+<div class="card">
+<div class="head">
+  <div>
+    <h2>Shop Management</h2>
+    <span class="muted">Approve, disable or delete unauthorized shops.</span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <input id="sq" placeholder="🔎 Search shop/owner/city" oninput="renderShops()">
+  <select id="sf" onchange="renderShops()">
+    <option value="all">All</option>
+    <option value="approved">Approved</option>
+    <option value="pending">Pending</option>
+    <option value="disabled">Disabled</option>
+  </select>
+</div>
+
+<div class="tablewrap">
+<table class="table">
+<thead>
+<tr>
+<th>Shop</th><th>Owner</th><th>City</th><th>Status</th><th>Bookings</th><th>Actions</th>
+</tr>
+</thead>
+<tbody id="shopTable"></tbody>
+</table>
+</div>
+</div>
 </section>
 
-<section id="bookings" class="hide"><div class="card"><div class="head"><div><h2>All Bookings</h2><span class="muted">Central booking monitor.</span></div></div><div class="tablewrap"><table class="table"><thead><tr><th>Token</th><th>Customer</th><th>Shop</th><th>Date</th><th>Time</th><th>Status</th></tr></thead><tbody id="bookingTable"></tbody></table></div></div></section>
+<section id="bookings" class="hide">
+<div class="card">
+<div class="head">
+  <div>
+    <h2>All Bookings</h2>
+    <span class="muted">Central booking monitor.</span>
+  </div>
+</div>
 
-<section id="customers" class="hide"><div class="card"><div class="head"><div><h2>Customers</h2><span class="muted">Customer overview.</span></div></div><div class="tablewrap"><table class="table"><thead><tr><th>Name</th><th>Mobile</th><th>Bookings</th><th>Last Booking</th></tr></thead><tbody id="customerTable"></tbody></table></div></div></section>
+<div class="tablewrap">
+<table class="table">
+<thead>
+<tr><th>Token</th><th>Customer</th><th>Shop</th><th>Date</th><th>Time</th><th>Status</th></tr>
+</thead>
+<tbody id="bookingTable"></tbody>
+</table>
+</div>
+</div>
+</section>
 
-</div></main></div>
+<section id="customers" class="hide">
+<div class="card">
+<div class="head">
+  <div>
+    <h2>Customers</h2>
+    <span class="muted">Customer overview.</span>
+  </div>
+</div>
+
+<div class="tablewrap">
+<table class="table">
+<thead>
+<tr><th>Name</th><th>Mobile</th><th>Bookings</th><th>Last Booking</th></tr>
+</thead>
+<tbody id="customerTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+</div>
+</main>
+</div>
 
 <script>
-const shops=[
-{id:1,name:"Royal Cuts",owner:"Rahul Sharma",city:"Sikar",status:"approved",bookings:38},
-{id:2,name:"Style Studio",owner:"Amit Kumar",city:"Jaipur",status:"pending",bookings:12},
-{id:3,name:"Gentleman's Point",owner:"Vikas Singh",city:"Sikar",status:"approved",bookings:27},
-{id:4,name:"Fresh Look Barber",owner:"Unknown Owner",city:"Jhunjhunu",status:"disabled",bookings:3}
-];
-const bookings=[
-["A12","Rohit","Royal Cuts","2026-08-24","18:30","waiting"],
-["B07","Aman","Style Studio","2026-08-24","19:00","pending"],
-["C21","Neeraj","Gentleman's Point","2026-08-24","19:15","confirmed"],
-["A11","Karan","Royal Cuts","2026-08-24","18:00","completed"]
-];
-const customers=[["Rohit Kumar","98******21",8,"24 Aug 2026"],["Aman Sharma","97******45",4,"24 Aug 2026"],["Neeraj Singh","99******72",6,"23 Aug 2026"],["Karan Gupta","96******18",11,"24 Aug 2026"]];
-function $(x){return document.getElementById(x)}
-function login(){if(!$("email").value||!$("pass").value){$("msg").className="notice";$("msg").textContent="Enter email and password.";return}$("login").classList.add("hide");$("app").classList.remove("hide");render()}
-function page(p,b){["dashboard","shops","bookings","customers"].forEach(x=>$(x).classList.add("hide"));$(p).classList.remove("hide");$("title").textContent=p[0].toUpperCase()+p.slice(1);document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("on"));if(b)b.classList.add("on")}
-function render(){let a=shops.filter(x=>x.status==="approved").length,p=shops.filter(x=>x.status==="pending").length;$("stats").innerHTML=[["🏪","Total Shops",shops.length],["✓","Approved",a],["⏳","Pending",p],["📋","Bookings",bookings.length],["👥","Customers",customers.length]].map(x=>`<div class="stat"><b>${x[0]} ${x[1]}</b><h2>${x[2]}</h2></div>`).join("");renderShops();$("bookingTable").innerHTML=bookings.map(b=>`<tr><td><b>${b[0]}</b></td><td>${b[1]}</td><td>${b[2]}</td><td>${b[3]}</td><td>${b[4]}</td><td><span class="pill ${b[5]}">${b[5]}</span></td></tr>`).join("");$("customerTable").innerHTML=customers.map(c=>`<tr><td><b>${c[0]}</b></td><td>${c[1]}</td><td>${c[2]}</td><td>${c[3]}</td></tr>`).join("");$("recentShops").innerHTML=shops.slice(0,4).map(s=>`<div class="activity"><b>${s.name}</b><br><span class="muted">${s.city} · ${s.status}</span></div>`).join("");$("recentBookings").innerHTML=bookings.slice(0,4).map(b=>`<div class="activity"><b>${b[0]} · ${b[1]}</b><br><span class="muted">${b[2]} · ${b[5]}</span></div>`).join("")}
-function renderShops(){let q=($("sq")?.value||"").toLowerCase(),f=$("sf")?.value||"all";let r=shops.filter(s=>(f==="all"||s.status===f)&&[s.name,s.owner,s.city].join(" ").toLowerCase().includes(q));$("shopTable").innerHTML=r.map(s=>`<tr><td><b>${s.name}</b></td><td>${s.owner}</td><td>${s.city}</td><td><span class="pill ${s.status}">${s.status}</span></td><td>${s.bookings}</td><td>${s.status==="pending"?`<button class="btn green" onclick="change(${s.id},'approved')">Approve</button>`:""} ${s.status==="approved"?`<button class="btn light" onclick="change(${s.id},'disabled')">Disable</button>`:""} ${s.status==="disabled"?`<button class="btn blue" onclick="change(${s.id},'approved')">Enable</button>`:""} <button class="btn red" onclick="del(${s.id})">Delete</button></td></tr>`).join("")||'<tr><td colspan="6" style="text-align:center">No shops found.</td></tr>'}
-function change(id,status){let s=shops.find(x=>x.id===id);if(s){s.status=status;render()}}
-function del(id){let s=shops.find(x=>x.id===id);if(!s)return;if(confirm("Delete unauthorized shop “"+s.name+"”?")){shops.splice(shops.indexOf(s),1);render()}}
+/* ==============================
+   TRIMD ADMIN DEMO DATA
+   Empty by default — no fake shops
+   ============================== */
+
+const shops = [];
+
+const bookings = [];
+
+const customers = [];
+
+function $(x){
+  return document.getElementById(x);
+}
+
+function login(){
+  const email = $("email").value.trim();
+  const pass = $("pass").value.trim();
+
+  if(!email || !pass){
+    $("msg").className = "notice";
+    $("msg").textContent = "Enter email and password.";
+    return;
+  }
+
+  $("msg").textContent = "";
+  $("login").classList.add("hide");
+  $("app").classList.remove("hide");
+  render();
+}
+
+function logout(){
+  $("app").classList.add("hide");
+  $("login").classList.remove("hide");
+  $("pass").value = "";
+}
+
+function page(p,b){
+  ["dashboard","shops","bookings","customers"].forEach(x=>{
+    $(x).classList.add("hide");
+  });
+
+  $(p).classList.remove("hide");
+
+  $("title").textContent =
+    p.charAt(0).toUpperCase() + p.slice(1);
+
+  document.querySelectorAll(".nav button").forEach(x=>{
+    x.classList.remove("on");
+  });
+
+  if(b) b.classList.add("on");
+}
+
+function emptyRow(message, colspan){
+  return `
+    <tr>
+      <td colspan="${colspan}" style="text-align:center;padding:35px;color:#64748b">
+        ${message}
+      </td>
+    </tr>
+  `;
+}
+
+function render(){
+
+  const approved =
+    shops.filter(x=>x.status==="approved").length;
+
+  const pending =
+    shops.filter(x=>x.status==="pending").length;
+
+  const disabled =
+    shops.filter(x=>x.status==="disabled").length;
+
+  $("stats").innerHTML = [
+    ["🏪","Total Shops",shops.length],
+    ["✓","Approved",approved],
+    ["⏳","Pending",pending],
+    ["🚫","Disabled",disabled],
+    ["📋","Bookings",bookings.length]
+  ].map(x=>`
+    <div class="stat">
+      <b>${x[0]} ${x[1]}</b>
+      <h2>${x[2]}</h2>
+    </div>
+  `).join("");
+
+  renderShops();
+
+  $("bookingTable").innerHTML =
+    bookings.length
+    ? bookings.map(b=>`
+      <tr>
+        <td><b>${b[0]}</b></td>
+        <td>${b[1]}</td>
+        <td>${b[2]}</td>
+        <td>${b[3]}</td>
+        <td>${b[4]}</td>
+        <td><span class="pill ${b[5]}">${b[5]}</span></td>
+      </tr>
+    `).join("")
+    : emptyRow("No bookings yet.",6);
+
+  $("customerTable").innerHTML =
+    customers.length
+    ? customers.map(c=>`
+      <tr>
+        <td><b>${c[0]}</b></td>
+        <td>${c[1]}</td>
+        <td>${c[2]}</td>
+        <td>${c[3]}</td>
+      </tr>
+    `).join("")
+    : emptyRow("No customers yet.",4);
+
+  $("recentShops").innerHTML =
+    shops.length
+    ? shops.slice(0,5).map(s=>`
+      <div class="activity">
+        <b>${s.name}</b><br>
+        <span class="muted">${s.city} · ${s.status}</span>
+      </div>
+    `).join("")
+    : `<div class="empty">No shops registered yet.</div>`;
+
+  $("recentBookings").innerHTML =
+    bookings.length
+    ? bookings.slice(0,5).map(b=>`
+      <div class="activity">
+        <b>${b[0]} · ${b[1]}</b><br>
+        <span class="muted">${b[2]} · ${b[5]}</span>
+      </div>
+    `).join("")
+    : `<div class="empty">No bookings yet.</div>`;
+}
+
+function renderShops(){
+
+  const q =
+    ($("sq")?.value || "").toLowerCase();
+
+  const f =
+    $("sf")?.value || "all";
+
+  const result =
+    shops.filter(s =>
+      (f==="all" || s.status===f) &&
+      [s.name,s.owner,s.city]
+      .join(" ")
+      .toLowerCase()
+      .includes(q)
+    );
+
+  $("shopTable").innerHTML =
+    result.length
+    ? result.map(s=>`
+      <tr>
+        <td><b>${s.name}</b></td>
+        <td>${s.owner}</td>
+        <td>${s.city}</td>
+        <td>
+          <span class="pill ${s.status}">
+            ${s.status}
+          </span>
+        </td>
+        <td>${s.bookings}</td>
+        <td>
+          ${
+            s.status==="pending"
+            ? `<button class="btn green"
+                onclick="changeStatus(${s.id},'approved')">
+                Approve
+              </button>`
+            : ""
+          }
+
+          ${
+            s.status==="approved"
+            ? `<button class="btn light"
+                onclick="changeStatus(${s.id},'disabled')">
+                Disable
+              </button>`
+            : ""
+          }
+
+          ${
+            s.status==="disabled"
+            ? `<button class="btn blue"
+                onclick="changeStatus(${s.id},'approved')">
+                Enable
+              </button>`
+            : ""
+          }
+
+          <button class="btn red"
+            onclick="deleteShop(${s.id})">
+            Delete
+          </button>
+        </td>
+      </tr>
+    `).join("")
+    : emptyRow("No shops registered yet.",6);
+}
+
+function changeStatus(id,status){
+
+  const shop =
+    shops.find(x=>x.id===id);
+
+  if(!shop) return;
+
+  shop.status = status;
+  render();
+}
+
+function deleteShop(id){
+
+  const shop =
+    shops.find(x=>x.id===id);
+
+  if(!shop) return;
+
+  if(confirm(
+    'Delete unauthorized shop "' +
+    shop.name +
+    '"?'
+  )){
+    shops.splice(
+      shops.indexOf(shop),
+      1
+    );
+
+    render();
+  }
+}
 </script>
-</body></html>
+
+</body>
+</html>
