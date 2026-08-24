@@ -1,16 +1,15 @@
 {
-  "name": "TrimD — Barber Appointment & Queue",
+  "name": "TrimD",
   "short_name": "TrimD",
-  "id": "trimd",
-  "start_url": "./",
-  "scope": "./",
+  "id": "/Ad-cut/",
+  "start_url": "/Ad-cut/",
+  "scope": "/Ad-cut/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#111827",
-  "theme_color": "#111827",
+  "theme_color": "#f5a400",
   "description": "TrimD is a smart barber appointment and queue management app that helps customers book appointments and manage their waiting time easily.",
   "lang": "en",
-  "dir": "ltr",
   "categories": [
     "beauty",
     "lifestyle"
