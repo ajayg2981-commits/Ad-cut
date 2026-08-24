@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TrimD Shop</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f7fb;color:#172033}.top{background:#111827;color:#fff;padding:16px;position:sticky;top:0;z-index:5}.topin,.wrap{max-width:1100px;margin:auto}.brand{font-size:24px;font-weight:900}.brand b{color:#f59e0b}.wrap{padding:18px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px;margin-bottom:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}input,select,textarea{width:100%;padding:12px;border:1px solid #d9dee8;border-radius:9px;margin:5px 0 10px}.btn{border:0;background:#f59e0b;color:#111827;font-weight:800;border-radius:9px;padding:11px 15px;cursor:pointer}.btn.alt{background:#e8edf5}.btn.green{background:#dcfce7;color:#166534}.btn.red{background:#fee2e2;color:#991b1b}.row{border-bottom:1px solid #eee;padding:13px 0}.pill{display:inline-block;padding:5px 9px;border-radius:20px;background:#fff7ed;color:#9a3412;font-size:11px}.muted{color:#64748b;font-size:13px}.notice{padding:12px;border-radius:10px;background:#ecfdf5;color:#166534;margin-top:8px}.error{background:#fee2e2;color:#991b1b}.hidden{display:none}.head{display:flex;justify-content:space-between;gap:10px;align-items:center}@media(max-width:700px){.grid,.two{grid-template-columns:1fr}}
+</style></head><body>
+<div class="top"><div class="topin"><div class="brand">Trim<b>D</b> Shop</div></div></div>
+<div class="wrap">
+<section class="card" id="auth"><h2>Shop Owner Login / Register</h2><input id="email" type="email" placeholder="Owner email"><input id="password" type="password" placeholder="Password (6+ characters)"><button class="btn" onclick="register()">Register / Create account</button> <button class="btn alt" onclick="login()">Login</button><div id="authMsg"></div></section>
+
+<section class="card hidden" id="registerCard"><h2>Register your shop</h2><p class="muted">Allow location access so customers within 10 km can find your shop.</p>
+<input id="shopName" placeholder="Shop name"><textarea id="description" placeholder="Description"></textarea><input id="address" placeholder="Full address"><input id="city" placeholder="City"><input id="wa" inputmode="numeric" placeholder="Shop WhatsApp with country code, e.g. 919876543210">
+<div class="two"><input id="lat" placeholder="Latitude"><input id="lng" placeholder="Longitude"></div><button class="btn" onclick="useLocation()">📍 Use current location</button> <button class="btn green" onclick="saveShop()">Register shop</button><div id="shopMsg"></div></section>
+
+<section class="card hidden" id="dashboard"><div class="head"><div><h2 id="shopTitle">Shop Dashboard</h2><p class="muted">Confirm/reject customer requests and manage today's queue.</p></div><button class="btn alt" onclick="logout()">Logout</button></div>
+<div id="stats"></div><div id="requests"></div></section>
+
+<section class="card hidden" id="manage"><h2>Services & Barbers</h2><div class="grid"><div><h3>Add service</h3><input id="serviceName" placeholder="Haircut"><input id="servicePrice" type="number" placeholder="Price"><input id="serviceDuration" type="number" value="30" placeholder="Minutes"><button class="btn" onclick="addService()">Add service</button><div id="services"></div></div><div><h3>Add barber</h3><input id="barberName" placeholder="Barber name"><button class="btn" onclick="addBarber()">Add barber</button><div id="barbers"></div></div></div></section>
+
+<section class="card hidden" id="notif"><h2>Shop notifications</h2><div id="notifications"></div></section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://bjebexsledooklafvfqb.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_dgLMU1U1cG81VcG_8KeuPQ_juJ-O626";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let user=null,shop=null;
+
+async function register(){const email=v("email"),password=v("password");if(password.length<6)return msg("authMsg","Password must be 6+ characters.",true);const {data,error}=await db.auth.signUp({email,password});if(error)return msg("authMsg",error.message,true);if(data.session){user=data.user;showRegister();}else msg("authMsg","Account created. Check email confirmation, then login.");}
+async function login(){const {data,error}=await db.auth.signInWithPassword({email:v("email"),password:v("password")});if(error)return msg("authMsg",error.message,true);user=data.user;await boot();}
+async function boot(){const r=await db.auth.getUser();user=r.data.user;if(!user)return;document.getElementById("auth").classList.add("hidden");const q=await db.from("trimd_shops").select("*").eq("owner_id",user.id).maybeSingle();if(!q.data){showRegister();return}shop=q.data;showDash();subscribe();}
+function showRegister(){document.getElementById("auth").classList.add("hidden");document.getElementById("registerCard").classList.remove("hidden");}
+function useLocation(){if(!navigator.geolocation)return msg("shopMsg","Location not supported.",true);navigator.geolocation.getCurrentPosition(p=>{vset("lat",p.coords.latitude.toFixed(7));vset("lng",p.coords.longitude.toFixed(7));msg("shopMsg","Location added.");},e=>msg("shopMsg","Please allow location permission.",true),{enableHighAccuracy:true,timeout:10000});}
+async function saveShop(){
+ if(!user)return msg("shopMsg","Please login again before registering the shop.",true);
+ const lat=parseFloat(v("lat")),lng=parseFloat(v("lng"));
+ if(!v("shopName")||!v("wa")||!Number.isFinite(lat)||!Number.isFinite(lng))return msg("shopMsg","Shop name, WhatsApp and location are required.",true);
+ msg("shopMsg","Creating owner profile...");
+ const profile=await db.from("trimd_profiles").upsert({id:user.id,role:"shop_owner"},{onConflict:"id"});
+ if(profile.error)return msg("shopMsg","Owner profile error: "+profile.error.message,true);
+ msg("shopMsg","Profile ready. Registering shop...");
+ const {data,error}=await db.from("trimd_shops").insert({owner_id:user.id,name:v("shopName"),description:v("description"),address:v("address"),city:v("city"),whatsapp:v("wa").replace(/\D/g,""),latitude:lat,longitude:lng}).select().single();
+ if(error)return msg("shopMsg","Shop registration failed: "+error.message,true);
+ shop=data;msg("shopMsg","Shop registered successfully.");showDash();subscribe();
+}
+function showDash(){["dashboard","manage","notif"].forEach(id=>document.getElementById(id).classList.remove("hidden"));document.getElementById("registerCard").classList.add("hidden");document.getElementById("shopTitle").textContent=shop.name+" — Dashboard";loadAll();}
+async function loadAll(){await loadRequests();await loadServices();await loadBarbers();await loadNotifications();}
+async function loadRequests(){const {data,error}=await db.from("trimd_bookings").select("*,trimd_services(name),trimd_barbers(name)").eq("shop_id",shop.id).order("created_at",{ascending:false}).limit(50);if(error)return msg("requests",error.message,true);const rows=data||[];const counts={requested:0,pending:0,confirmed:0,waiting:0,in_service:0,completed:0,rejected:0,cancelled:0};rows.forEach(x=>counts[x.status]=(counts[x.status]||0)+1);document.getElementById("stats").innerHTML=`<p><b>Pending:</b> ${counts.requested+counts.pending} &nbsp; <b>Confirmed:</b> ${counts.confirmed} &nbsp; <b>Waiting:</b> ${counts.waiting} &nbsp; <b>In service:</b> ${counts.in_service} &nbsp; <b>Completed:</b> ${counts.completed}</p>`;
+document.getElementById("requests").innerHTML=rows.length?rows.map(b=>`<div class="row"><span class="pill">${esc(b.status)}</span> <b>${esc(b.token)} · ${esc(b.customer_name)}</b><br><span class="muted">${esc(b.customer_mobile)} · ${esc(b.booking_date)} · ${esc(b.appointment_time)} · ${esc(b.trimd_services?.name||"")}${b.trimd_barbers?.name?" · "+esc(b.trimd_barbers.name):""}</span><br><small>${esc(b.customer_message||"")}</small><br>${(b.status==="requested"||b.status==="pending")?`<button class="btn green" onclick="setStatus('${b.id}','confirmed')">✓ Confirm</button> <button class="btn red" onclick="setStatus('${b.id}','rejected')">✕ Reject</button>`:""} ${b.status==="confirmed"?`<button class="btn" onclick="setStatus('${b.id}','waiting')">Put in queue</button>`:""} ${b.status==="waiting"?`<button class="btn" onclick="setStatus('${b.id}','in_service')">Start service</button>`:""} ${b.status==="in_service"?`<button class="btn green" onclick="setStatus('${b.id}','completed')">Finish</button>`:""}</div>`).join(""):"<p class='muted'>No booking requests.</p>";}
+async function setStatus(id,status){const update={status};if(status==="confirmed")update.confirmed_at=new Date().toISOString();const {data,error}=await db.from("trimd_bookings").update(update).eq("id",id).select().single();if(error)return alert(error.message);if(status==="confirmed")await sendWA(data,"booking_confirmed");if(status==="rejected")await sendWA(data,"booking_rejected");await loadRequests();}
+async function loadServices(){const {data}=await db.from("trimd_services").select("*").eq("shop_id",shop.id).order("name");document.getElementById("services").innerHTML=(data||[]).map(x=>`<div class="row">${esc(x.name)} · ₹${x.price} · ${x.duration_minutes} min</div>`).join("")||"<p class='muted'>No services.</p>";}
+async function addService(){if(!v("serviceName"))return;const {error}=await db.from("trimd_services").insert({shop_id:shop.id,name:v("serviceName"),price:Number(v("servicePrice")||0),duration_minutes:Number(v("serviceDuration")||30)});if(error)return alert(error.message);vset("serviceName","");await loadServices();}
+async function loadBarbers(){const {data}=await db.from("trimd_barbers").select("*").eq("shop_id",shop.id).order("name");document.getElementById("barbers").innerHTML=(data||[]).map(x=>`<div class="row">${esc(x.name)}</div>`).join("")||"<p class='muted'>No barbers.</p>";}
+async function addBarber(){if(!v("barberName"))return;const {error}=await db.from("trimd_barbers").insert({shop_id:shop.id,name:v("barberName")});if(error)return alert(error.message);vset("barberName","");await loadBarbers();}
+async function loadNotifications(){const {data}=await db.from("trimd_notifications").select("*").eq("user_id",user.id).order("created_at",{ascending:false}).limit(30);document.getElementById("notifications").innerHTML=(data||[]).map(n=>`<div class="row"><b>${esc(n.title)}</b><br><span class="muted">${esc(n.message)} · ${new Date(n.created_at).toLocaleString()}</span></div>`).join("")||"<p class='muted'>No notifications.</p>";}
+function subscribe(){db.channel("shop-live-"+shop.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"trimd_bookings",filter:"shop_id=eq."+shop.id},async p=>{await loadRequests();}).on("postgres_changes",{event:"*",schema:"public",table:"trimd_notifications",filter:"user_id=eq."+user.id},()=>loadNotifications()).subscribe();}
+async function sendWA(booking,event){try{const sess=(await db.auth.getSession()).data.session;const r=await fetch(SUPABASE_URL+"/functions/v1/send-whatsapp",{method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_PUBLISHABLE_KEY,"Authorization":"Bearer "+(sess?.access_token||"")},body:JSON.stringify({booking_id:booking.id,event})});return await r.json();}catch(e){console.log(e)}}
+async function logout(){await db.auth.signOut();location.reload()}
+function msg(id,t,err=false){const e=document.getElementById(id);e.className=err?"notice error":"notice";e.textContent=t}function v(id){return document.getElementById(id).value.trim()}function vset(id,x){document.getElementById(id).value=x||""}function esc(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+db.auth.getSession().then(({data})=>{if(data.session)boot()});
+</script></body></html>
