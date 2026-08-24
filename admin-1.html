@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TrimD — Admin Control</title>
+<meta name="theme-color" content="#0b1220">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#f4f6fa;color:#111827}
+button,input,select{font:inherit}button{cursor:pointer}.hide{display:none!important}
+.side{position:fixed;left:0;top:0;bottom:0;width:240px;background:#0b1220;color:#fff;padding:20px 14px;z-index:10}
+.brand{font-size:22px;font-weight:900;padding:4px 8px 25px}
+.logo{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#f5a400;color:#111;margin-right:8px}
+.gold{color:#f5a400}
+.nav button{display:block;width:100%;border:0;background:transparent;color:#cbd5e1;text-align:left;padding:12px;border-radius:11px;margin:4px 0;font-weight:bold}
+.nav button:hover,.nav button.on{background:#ffffff15;color:white}
+.main{margin-left:240px}.top{height:68px;background:white;border-bottom:1px solid #e5e7eb;padding:0 25px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.wrap{padding:24px;max-width:1400px;margin:auto}
+.hero{background:linear-gradient(135deg,#0b1220,#263449);color:white;border-radius:22px;padding:25px;margin-bottom:18px}
+.hero h1{margin:6px 0;font-size:28px}.hero p{color:#cbd5e1}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+.stat,.card{background:white;border:1px solid #e5e7eb;border-radius:18px;padding:17px;box-shadow:0 7px 25px #1118270b}
+.stat b{color:#64748b;font-size:12px}.stat h2{margin:7px 0 0;font-size:27px}.card{margin-bottom:18px}
+.head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:14px}
+.muted{color:#64748b;font-size:13px}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:900;background:#f5a400;color:#111}
+.green{background:#dcfce7;color:#166534}.red{background:#fee2e2;color:#991b1b}.blue{background:#dbeafe;color:#1d4ed8}.light{background:#eef2f7;color:#334155}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.toolbar input,.toolbar select{padding:11px;border:1px solid #dbe1ea;border-radius:10px}.toolbar input{min-width:260px}
+.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:760px}
+.table th,.table td{text-align:left;padding:12px;border-bottom:1px solid #edf0f4;font-size:13px}.table th{font-size:10px;color:#64748b;text-transform:uppercase}
+.pill{padding:5px 8px;border-radius:99px;font-size:10px;font-weight:900;text-transform:uppercase}
+.approved{background:#dcfce7;color:#166534}.pending{background:#fff7ed;color:#9a3412}.disabled{background:#e5e7eb;color:#475569}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.activity{padding:11px 0;border-bottom:1px solid #edf0f4}
+.login{max-width:430px;margin:9vh auto;background:white;border:1px solid #e5e7eb;border-radius:22px;padding:25px;box-shadow:0 15px 45px #11182715}
+.login h1{text-align:center}.field{margin:12px 0}.field label{display:block;font-size:12px;font-weight:bold;margin-bottom:6px}
+.field input{width:100%;padding:12px;border:1px solid #d8dee8;border-radius:11px}.notice{margin-top:10px;padding:10px;border-radius:10px;font-size:13px}
+.ok{background:#dcfce7;color:#166534}.err{background:#fee2e2;color:#991b1b}.info{background:#dbeafe;color:#1d4ed8}
+.setup{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:12px;border-radius:12px;font-size:13px;margin-bottom:15px}
+.empty{text-align:center;padding:25px;color:#64748b}
+@media(max-width:950px){.stats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}}
+@media(max-width:650px){
+.side{width:65px;padding:12px 7px}.brandText,.nav span{display:none}.nav button{text-align:center}
+.main{margin-left:65px}.wrap{padding:14px}.top{padding:0 12px}.stats{grid-template-columns:1fr 1fr}
+.stat:last-child{grid-column:span 2}.hero{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<section id="login" class="login">
+  <div class="brand" style="text-align:center">
+    <span class="logo">✂</span><span class="brandText">Trim<span class="gold">D</span></span>
+  </div>
+  <h1>Admin Control Panel</h1>
+  <p class="muted" style="text-align:center">Secure Supabase login</p>
+
+  <div id="setupBox" class="setup">
+    <b>First-time setup:</b> Open this file and put your Supabase URL and anon key in the
+    <b>CONFIG</b> section near the bottom. Never put a service-role key here.
+  </div>
+
+  <div class="field"><label>Admin Email</label><input id="email" type="email" autocomplete="username" placeholder="admin email"></div>
+  <div class="field"><label>Password</label><input id="pass" type="password" autocomplete="current-password" placeholder="Password"></div>
+  <button class="btn" style="width:100%" onclick="login()">Login</button>
+  <div id="msg"></div>
+</section>
+
+<div id="app" class="hide">
+<aside class="side">
+  <div class="brand">
+    <span class="logo">✂</span>
+    <span class="brandText">Trim<span class="gold">D</span>
+      <small style="display:block;font-size:8px;color:#94a3b8;letter-spacing:2px">ADMIN</small>
+    </span>
+  </div>
+  <div class="nav">
+    <button class="on" onclick="page('dashboard',this)">📊 <span>Dashboard</span></button>
+    <button onclick="page('shops',this)">🏪 <span>Shops</span></button>
+    <button onclick="page('bookings',this)">📋 <span>Bookings</span></button>
+    <button onclick="page('customers',this)">👥 <span>Customers</span></button>
+  </div>
+</aside>
+
+<main class="main">
+<header class="top"><b id="title">Dashboard</b><button class="btn light" onclick="logout()">Logout</button></header>
+<div class="wrap">
+
+<section id="dashboard">
+<div class="hero">
+  <small class="gold">TRIMD ADMIN</small>
+  <h1>Admin Dashboard 👋</h1>
+  <p>Live data from your Supabase database.</p>
+</div>
+<div class="stats" id="stats"></div>
+<div class="grid">
+  <div class="card"><div class="head"><div><h2>Recent Shops</h2><span class="muted">Latest registrations</span></div></div><div id="recentShops"></div></div>
+  <div class="card"><div class="head"><div><h2>Recent Bookings</h2><span class="muted">Latest activity</span></div></div><div id="recentBookings"></div></div>
+</div>
+</section>
+
+<section id="shops" class="hide">
+<div class="card">
+<div class="head"><div><h2>Shop Management</h2><span class="muted">Approve, disable or delete unauthorized shops.</span></div></div>
+<div class="toolbar">
+<input id="sq" placeholder="🔎 Search shop/owner/city" oninput="renderShops()">
+<select id="sf" onchange="renderShops()">
+<option value="all">All</option><option value="approved">Approved</option><option value="pending">Pending</option><option value="disabled">Disabled</option>
+</select>
+<button class="btn light" onclick="loadAll()">↻ Refresh</button>
+</div>
+<div class="tablewrap"><table class="table">
+<thead><tr><th>Shop</th><th>Owner</th><th>City</th><th>Status</th><th>Bookings</th><th>Actions</th></tr></thead>
+<tbody id="shopTable"></tbody>
+</table></div>
+</div>
+</section>
+
+<section id="bookings" class="hide">
+<div class="card">
+<div class="head"><div><h2>All Bookings</h2><span class="muted">Central booking monitor.</span></div></div>
+<div class="tablewrap"><table class="table">
+<thead><tr><th>Token</th><th>Customer</th><th>Shop</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+<tbody id="bookingTable"></tbody>
+</table></div>
+</div>
+</section>
+
+<section id="customers" class="hide">
+<div class="card">
+<div class="head"><div><h2>Customers</h2><span class="muted">Customer overview.</span></div></div>
+<div class="tablewrap"><table class="table">
+<thead><tr><th>Name</th><th>Mobile</th><th>Bookings</th><th>Last Booking</th></tr></thead>
+<tbody id="customerTable"></tbody>
+</table></div>
+</div>
+</section>
+
+</div></main></div>
+
+<script>
+/* =========================================================
+   CONFIG
+   Replace ONLY these two values with your Supabase project
+   URL and anon/public key.
+   NEVER put the service_role key in this HTML.
+   ========================================================= */
+const CONFIG = {
+  SUPABASE_URL: "YOUR_SUPABASE_URL",
+  SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_KEY"
+};
+
+/*
+  Expected tables/columns.
+  shops:
+    id, name, owner_name (or owner), city,
+    status, is_active, created_at
+  bookings:
+    id, token (or token_number), customer_name,
+    shop_id (or shop_name), booking_date/date,
+    booking_time/time, status, created_at
+  customers:
+    id, name, mobile/phone, created_at
+*/
+let sb=null, shops=[], bookings=[], customers=[];
+
+function $(id){return document.getElementById(id)}
+function safe(v){return v==null?"":String(v)}
+function first(o, keys, fallback=""){
+  for(const k of keys){if(o && o[k]!==undefined && o[k]!==null && o[k]!=="") return o[k]}
+  return fallback
+}
+function statusClass(s){
+  s=safe(s).toLowerCase();
+  if(s==="approved"||s==="active"||s==="confirmed"||s==="completed") return "approved";
+  if(s==="pending"||s==="waiting") return "pending";
+  return "disabled";
+}
+function msg(text,type="err"){
+  $("msg").className="notice "+type;
+  $("msg").textContent=text;
+}
+
+function initSupabase(){
+  if(!window.supabase){msg("Supabase library could not load. Check internet connection.");return false}
+  if(CONFIG.SUPABASE_URL.startsWith("YOUR_") || CONFIG.SUPABASE_ANON_KEY.startsWith("YOUR_")){
+    msg("Supabase URL and anon key are not configured.","info");
+    return false;
+  }
+  sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
+  return true;
+}
+
+async function login(){
+  if(!initSupabase()) return;
+  const email=$("email").value.trim(), password=$("pass").value;
+  if(!email||!password){msg("Enter email and password.");return}
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  if(error){msg(error.message);return}
+  $("login").classList.add("hide");
+  $("app").classList.remove("hide");
+  await loadAll();
+}
+
+async function logout(){
+  if(sb) await sb.auth.signOut();
+  location.reload();
+}
+
+async function loadAll(){
+  if(!sb) return;
+  try{
+    const [s,b,c]=await Promise.all([
+      sb.from("shops").select("*").order("created_at",{ascending:false}),
+      sb.from("bookings").select("*").order("created_at",{ascending:false}),
+      sb.from("customers").select("*").order("created_at",{ascending:false})
+    ]);
+
+    if(s.error) throw new Error("Shops: "+s.error.message);
+    if(b.error) throw new Error("Bookings: "+b.error.message);
+    if(c.error) throw new Error("Customers: "+c.error.message);
+
+    shops=s.data||[];
+    bookings=b.data||[];
+    customers=c.data||[];
+    render();
+  }catch(e){
+    alert("Database error: "+e.message);
+  }
+}
+
+function page(p,b){
+  ["dashboard","shops","bookings","customers"].forEach(x=>$(x).classList.add("hide"));
+  $(p).classList.remove("hide");
+  $("title").textContent=p[0].toUpperCase()+p.slice(1);
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("on"));
+  if(b)b.classList.add("on");
+  if(p==="shops")renderShops();
+}
+
+function render(){
+  const approved=shops.filter(x=>safe(x.status).toLowerCase()==="approved").length;
+  const pending=shops.filter(x=>safe(x.status).toLowerCase()==="pending").length;
+  $("stats").innerHTML=[
+    ["🏪","Total Shops",shops.length],
+    ["✓","Approved",approved],
+    ["⏳","Pending",pending],
+    ["📋","Bookings",bookings.length],
+    ["👥","Customers",customers.length]
+  ].map(x=>`<div class="stat"><b>${x[0]} ${x[1]}</b><h2>${x[2]}</h2></div>`).join("");
+
+  renderShops();
+
+  $("bookingTable").innerHTML=bookings.slice(0,200).map(b=>{
+    const token=first(b,["token","token_number","queue_token"],"-");
+    const customer=first(b,["customer_name","name","customer"],"-");
+    const shop=first(b,["shop_name","shop"],b.shop_id||"-");
+    const date=first(b,["booking_date","date"],"-");
+    const time=first(b,["booking_time","time"],"-");
+    const st=first(b,["status"],"pending");
+    return `<tr><td><b>${safe(token)}</b></td><td>${safe(customer)}</td><td>${safe(shop)}</td><td>${safe(date)}</td><td>${safe(time)}</td><td><span class="pill ${statusClass(st)}">${safe(st)}</span></td></tr>`
+  }).join("")||`<tr><td colspan="6" class="empty">No bookings found.</td></tr>`;
+
+  $("customerTable").innerHTML=customers.slice(0,200).map(c=>{
+    const name=first(c,["name","full_name"],"-");
+    const mobile=first(c,["mobile","phone","phone_number"],"-");
+    const count=bookings.filter(b=>String(first(b,["customer_id"],""))===String(c.id)).length;
+    return `<tr><td><b>${safe(name)}</b></td><td>${safe(mobile)}</td><td>${count}</td><td>${safe(first(c,["last_booking"],"-"))}</td></tr>`
+  }).join("")||`<tr><td colspan="4" class="empty">No customers found.</td></tr>`;
+
+  $("recentShops").innerHTML=shops.slice(0,5).map(s=>{
+    const name=first(s,["name","shop_name"],"Unnamed Shop");
+    const city=first(s,["city","location"],"-");
+    const st=first(s,["status"],"pending");
+    return `<div class="activity"><b>${safe(name)}</b><br><span class="muted">${safe(city)} · ${safe(st)}</span></div>`
+  }).join("")||`<div class="empty">No shops found.</div>`;
+
+  $("recentBookings").innerHTML=bookings.slice(0,5).map(b=>{
+    const token=first(b,["token","token_number"],"-");
+    const customer=first(b,["customer_name","name"],"-");
+    const shop=first(b,["shop_name","shop"],b.shop_id||"-");
+    const st=first(b,["status"],"pending");
+    return `<div class="activity"><b>${safe(token)} · ${safe(customer)}</b><br><span class="muted">${safe(shop)} · ${safe(st)}</span></div>`
+  }).join("")||`<div class="empty">No bookings found.</div>`;
+}
+
+function renderShops(){
+  const q=($("sq")?.value||"").toLowerCase();
+  const f=$("sf")?.value||"all";
+  const r=shops.filter(s=>{
+    const st=safe(s.status).toLowerCase();
+    return (f==="all"||st===f) &&
+      [first(s,["name","shop_name"]),first(s,["owner_name","owner","owner_name"]),first(s,["city","location"])]
+      .join(" ").toLowerCase().includes(q);
+  });
+
+  $("shopTable").innerHTML=r.map(s=>{
+    const id=s.id;
+    const name=first(s,["name","shop_name"],"Unnamed Shop");
+    const owner=first(s,["owner_name","owner","owner_name"],"-");
+    const city=first(s,["city","location"],"-");
+    const st=first(s,["status"],"pending").toLowerCase();
+    const count=bookings.filter(b=>String(first(b,["shop_id"],""))===String(id)).length;
+    const approve=st==="pending"?`<button class="btn green" onclick="changeShop('${String(id).replaceAll("'","")}','approved')">Approve</button>`:"";
+    const disable=st==="approved"?`<button class="btn light" onclick="changeShop('${String(id).replaceAll("'","")}','disabled')">Disable</button>`:"";
+    const enable=st==="disabled"?`<button class="btn blue" onclick="changeShop('${String(id).replaceAll("'","")}','approved')">Enable</button>`:"";
+    return `<tr>
+      <td><b>${safe(name)}</b></td><td>${safe(owner)}</td><td>${safe(city)}</td>
+      <td><span class="pill ${statusClass(st)}">${safe(st)}</span></td><td>${count}</td>
+      <td>${approve} ${disable} ${enable}
+      <button class="btn red" onclick="deleteShop('${String(id).replaceAll("'","")}')">Delete</button></td>
+    </tr>`;
+  }).join("")||`<tr><td colspan="6" class="empty">No shops found.</td></tr>`;
+}
+
+async function changeShop(id,status){
+  if(!sb)return;
+  if(!confirm((status==="approved"?"Approve":"Disable")+" this shop?"))return;
+
+  const {error}=await sb.from("shops").update({
+    status:status,
+    is_active:status==="approved"
+  }).eq("id",id);
+
+  if(error){alert("Update failed: "+error.message);return}
+  await loadAll();
+}
+
+async function deleteShop(id){
+  if(!sb)return;
+  const s=shops.find(x=>String(x.id)===String(id));
+  const name=first(s||{},["name","shop_name"],"this shop");
+  if(!confirm("Permanently delete "+name+"? This cannot be undone."))return;
+
+  const {error}=await sb.from("shops").delete().eq("id",id);
+  if(error){alert("Delete failed: "+error.message);return}
+  await loadAll();
+}
+
+window.addEventListener("load",async()=>{
+  if(!initSupabase())return;
+  const {data}=await sb.auth.getSession();
+  if(data.session){
+    $("login").classList.add("hide");
+    $("app").classList.remove("hide");
+    await loadAll();
+  }
+});
+</script>
+</body>
+</html>
