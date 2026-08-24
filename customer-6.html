@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>TrimD — Customer</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#111827;--muted:#667085;--line:#e7eaf0;--bg:#f6f7fb;--card:#fff;--accent:#f5a800;--accent2:#ffd86b;--green:#16a34a;--red:#dc2626}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(17,24,39,.96);backdrop-filter:blur(12px);color:#fff}
+.nav{max-width:900px;margin:auto;padding:13px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:22px}
+.logoMark{width:36px;height:36px;border-radius:11px;background:var(--accent);color:#111;display:grid;place-items:center;font-weight:1000}
+.logo span{color:var(--accent)}
+.live{font-size:12px;color:#86efac;font-weight:800}
+.live i{display:inline-block;width:7px;height:7px;background:#22c55e;border-radius:50%;margin-right:5px}
+.hero{max-width:900px;margin:auto;padding:30px 16px 18px}
+.heroBox{background:linear-gradient(135deg,#111827,#263449);color:#fff;border-radius:24px;padding:28px 22px;box-shadow:0 14px 35px rgba(17,24,39,.16)}
+.kicker{font-size:11px;letter-spacing:1.4px;color:#ffd166;font-weight:900;text-transform:uppercase}
+h1{font-size:32px;line-height:1.08;margin:8px 0 10px}
+.hero p{margin:0;color:#d7ddea;line-height:1.55}
+.container{max-width:900px;margin:auto;padding:0 16px 40px}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 5px 18px rgba(17,24,39,.04);margin-bottom:16px}
+.card h2{font-size:19px;margin:0 0 4px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:15px}
+.field{margin:10px 0}
+label{display:block;font-size:12px;font-weight:800;margin:0 0 6px;color:#344054}
+input,select{width:100%;border:1px solid #d8dde7;border-radius:12px;padding:13px 12px;background:#fff;outline:none}
+input:focus,select:focus{border-color:#f5a800;box-shadow:0 0 0 3px rgba(245,168,0,.13)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:0;border-radius:12px;padding:13px 15px;font-weight:900;background:var(--accent);color:#111827;width:100%}
+.btn:hover{filter:brightness(.97)}
+.btn.secondary{background:#eef1f6;color:#344054}
+.btn.green{background:#dcfce7;color:#166534}
+.btn.red{background:#fee2e2;color:#991b1b}
+.shop{border:1px solid var(--line);border-radius:15px;padding:14px;margin-top:10px}
+.shopTop{display:flex;justify-content:space-between;gap:10px}
+.shop h3{margin:0;font-size:16px}
+.open{font-size:11px;background:#dcfce7;color:#166534;border-radius:999px;padding:5px 8px;font-weight:800;height:max-content}
+.shop p{font-size:12px;color:var(--muted);margin:7px 0 11px}
+.shop .btn{width:auto;padding:9px 12px;font-size:12px}
+.statusBox{border-radius:16px;padding:15px;background:#f8fafc;border:1px solid var(--line)}
+.token{font-size:36px;font-weight:1000;letter-spacing:1px}
+.badge{display:inline-block;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:900;text-transform:capitalize}
+.pending{background:#fef3c7;color:#92400e}.confirmed{background:#dbeafe;color:#1d4ed8}.waiting{background:#dcfce7;color:#166534}.in_service{background:#ede9fe;color:#6d28d9}.completed{background:#e5e7eb;color:#374151}.rejected,.cancelled{background:#fee2e2;color:#991b1b}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:19px}.stat small{color:var(--muted);font-size:10px}
+.queueRow{display:grid;grid-template-columns:58px 1fr auto;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f4}
+.queueRow:last-child{border-bottom:0}
+.qToken{font-weight:1000;font-size:18px}
+.qName{font-weight:800;font-size:13px}.qMeta{font-size:11px;color:var(--muted);margin-top:3px}
+.notice{padding:11px 12px;border-radius:12px;background:#ecfdf3;color:#166534;font-size:12px;margin-top:10px}
+.notice.error{background:#fef2f2;color:#991b1b}
+.empty{padding:15px 0;color:var(--muted);font-size:13px}
+.footer{text-align:center;color:#98a2b3;font-size:12px;padding:10px 0 25px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.heroBox{border-radius:20px}h1{font-size:28px}.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="nav">
+    <div class="logo"><div class="logoMark">✂</div>Trim<span>D</span></div>
+    <div class="live"><i></i>LIVE</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="heroBox">
+    <div class="kicker">Smart barber booking</div>
+    <h1>Book your cut.<br>Skip the long wait.</h1>
+    <p>Choose your shop, barber and time. Track your booking and queue status from one place.</p>
+  </div>
+</section>
+
+<main class="container">
+  <div class="grid">
+    <div>
+      <section class="card" id="shops">
+        <h2>Find a barber shop</h2>
+        <div class="sub">Available TrimD shops</div>
+        <button class="btn secondary" onclick="loadShops()">↻ Refresh shops</button>
+        <div id="shopList"><div class="empty">Loading shops...</div></div>
+      </section>
+
+      <section class="card">
+        <h2>Live queue</h2>
+        <div class="sub">See who's currently waiting</div>
+        <div id="queueList"><div class="empty">Select a shop to view its queue.</div></div>
+        <div id="waitText" class="notice" style="display:none"></div>
+      </section>
+    </div>
+
+    <div>
+      <section class="card" id="book">
+        <h2>Book an appointment</h2>
+        <div class="sub">It takes less than a minute</div>
+
+        <div class="field">
+          <label>Your name</label>
+          <input id="customerName" placeholder="Enter your name" autocomplete="name">
+        </div>
+
+        <div class="field">
+          <label>Mobile number</label>
+          <input id="customerMobile" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel">
+        </div>
+
+        <div class="field">
+          <label>Shop</label>
+          <select id="shopSelect" onchange="shopChanged()">
+            <option value="">Select shop</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Service</label>
+          <select id="serviceSelect">
+            <option value="">Select service</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Barber</label>
+          <select id="barberSelect">
+            <option value="">Select barber</option>
+          </select>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>Date</label>
+            <input id="appointmentDate" type="date">
+          </div>
+          <div class="field">
+            <label>Time</label>
+            <input id="appointmentTime" type="time">
+          </div>
+        </div>
+
+        <button class="btn" onclick="requestBooking()">✓ Confirm booking</button>
+        <div id="bookingMsg"></div>
+      </section>
+
+      <section class="card">
+        <h2>My booking</h2>
+        <div class="sub">Your latest booking stays on this device</div>
+        <div id="myBooking"><div class="empty">No active booking yet.</div></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>Notifications</h2>
+    <div class="sub">Booking and queue updates</div>
+    <div id="notifications"><div class="empty">No new notifications.</div></div>
+  </section>
+
+  <div class="footer">TrimD • Smart barber booking & live queue</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://bjebexsledooklafvfqb.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_dgLMU1U1cG81VcG_8KeuPQ_juJ-O626";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+
+let shops=[],services=[],barbers=[],selectedShop=null,currentBooking=null,bookingChannel=null;
+
+const $=id=>document.getElementById(id);
+const v=id=>$(id).value.trim();
+const esc=x=>String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function today(){return new Date().toISOString().slice(0,10)}
+function notice(id,text,error=false){
+  const e=$(id); e.className=error?"notice error":"notice"; e.textContent=text;
+}
+function setDefaultDate(){
+  $("appointmentDate").min=today();
+  if(!$("appointmentDate").value) $("appointmentDate").value=today();
+}
+function statusClass(s){return String(s||"pending").toLowerCase().replaceAll(" ","_")}
+function prettyStatus(s){return String(s||"pending").replaceAll("_"," ")}
+function shopName(id){return shops.find(x=>x.id===id)?.name||"TrimD shop"}
+
+async function loadShops(){
+  $("shopList").innerHTML='<div class="empty">Loading shops...</div>';
+  const {data,error}=await db.from("trimd_shops")
+    .select("id,name,description,address,city,latitude,longitude")
+    .order("name");
+  if(error){
+    console.error(error);
+    $("shopList").innerHTML="";
+    notice("bookingMsg","Shop loading error: "+error.message,true);
+    return;
+  }
+  shops=data||[];
+  $("shopSelect").innerHTML='<option value="">Select shop</option>'+
+    shops.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}${x.city?" — "+esc(x.city):""}</option>`).join("");
+  renderShops();
+}
+function renderShops(){
+  if(!shops.length){
+    $("shopList").innerHTML='<div class="empty">No shops available right now.</div>'; return;
+  }
+  $("shopList").innerHTML=shops.map(x=>`
+    <div class="shop">
+      <div class="shopTop"><h3>${esc(x.name)}</h3><span class="open">OPEN</span></div>
+      <p>${esc(x.city||"")} ${x.address?"· "+esc(x.address):""}</p>
+      ${x.description?`<p>${esc(x.description)}</p>`:""}
+      <button class="btn" onclick="chooseShop('${esc(x.id)}')">Book here →</button>
+    </div>`).join("");
+}
+function chooseShop(id){
+  $("shopSelect").value=id;
+  shopChanged();
+  $("book").scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function shopChanged(){
+  const id=v("shopSelect");
+  selectedShop=shops.find(x=>x.id===id)||null;
+  $("serviceSelect").innerHTML='<option value="">Select service</option>';
+  $("barberSelect").innerHTML='<option value="">Select barber</option>';
+  services=[];barbers=[];
+  if(!selectedShop){
+    $("queueList").innerHTML='<div class="empty">Select a shop to view its queue.</div>';
+    $("waitText").style.display="none"; return;
+  }
+  const [sr,br]=await Promise.all([
+    db.from("trimd_services").select("*").eq("shop_id",id).order("name"),
+    db.from("trimd_barbers").select("*").eq("shop_id",id).order("name")
+  ]);
+  if(sr.error){notice("bookingMsg",sr.error.message,true);return}
+  if(br.error){notice("bookingMsg",br.error.message,true);return}
+  services=sr.data||[];barbers=br.data||[];
+  $("serviceSelect").innerHTML='<option value="">Select service</option>'+
+    services.map(x=>`<option value="${esc(x.id)}">${esc(x.name)} — ₹${x.price} · ${x.duration_minutes||30} min</option>`).join("");
+  $("barberSelect").innerHTML='<option value="">Select barber</option>'+
+    barbers.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("");
+  loadQueue(id);
+}
+async function loadQueue(shopId){
+  const {data,error}=await db.from("trimd_bookings")
+    .select("id,token,customer_name,appointment_time,status,created_at,trimd_services(name)")
+    .eq("shop_id",shopId)
+    .in("status",["confirmed","waiting","in_service"])
+    .order("created_at",{ascending:true})
+    .limit(50);
+  if(error){
+    $("queueList").innerHTML='<div class="empty">Queue unavailable.</div>'; return;
+  }
+  const rows=data||[];
+  $("queueList").innerHTML=rows.length?rows.map((b,i)=>`
+    <div class="queueRow">
+      <div class="qToken">${esc(b.token||("Q"+(i+1)))}</div>
+      <div><div class="qName">${esc(b.customer_name||"Customer")}</div>
+      <div class="qMeta">${esc(b.trimd_services?.name||"Service")} · ${esc(b.appointment_time||"")}</div></div>
+      <span class="badge ${statusClass(b.status)}">${esc(prettyStatus(b.status))}</span>
+    </div>`).join(""):'<div class="empty">No active customers in queue.</div>';
+  const waiting=rows.filter(x=>x.status==="waiting").length;
+  $("waitText").style.display="block";
+  $("waitText").textContent=waiting?`Estimated waiting time: about ${waiting*5}–${waiting*10} minutes`:"Queue is currently clear.";
+}
+async function requestBooking(){
+  const name=v("customerName"),mobile=v("customerMobile"),shopId=v("shopSelect"),
+        serviceId=v("serviceSelect"),barberId=v("barberSelect"),
+        date=v("appointmentDate"),time=v("appointmentTime");
+  if(!name||!mobile||!shopId||!serviceId||!barberId||!date||!time)
+    return notice("bookingMsg","Please fill all booking details.",true);
+  if(!/^\d{10}$/.test(mobile.replace(/\D/g,"")))
+    return notice("bookingMsg","Please enter a valid 10-digit mobile number.",true);
+  if(date<today()) return notice("bookingMsg","Please choose today or a future date.",true);
+
+  const {data,error}=await db.from("trimd_bookings").insert({
+    shop_id:shopId,
+    service_id:serviceId,
+    barber_id:barberId,
+    customer_name:name,
+    customer_mobile:mobile.replace(/\D/g,""),
+    booking_date:date,
+    appointment_time:time,
+    status:"pending"
+  }).select().single();
+
+  if(error){
+    console.error(error);
+    return notice("bookingMsg",error.message,true);
+  }
+  currentBooking=data;
+  localStorage.setItem("trimd_last_booking",JSON.stringify({id:data.id}));
+  showBooking(data);
+  subscribeToBooking(data.id);
+  notice("bookingMsg","Booking request sent successfully. Waiting for shop confirmation.");
+  addNotification("Booking requested",`Your booking at ${shopName(shopId)} is waiting for confirmation.`);
+}
+function showBooking(b){
+  const st=b.status||"pending";
+  const token=b.token||"—";
+  $("myBooking").innerHTML=`
+    <div class="statusBox">
+      <div class="small">BOOKING TOKEN</div>
+      <div class="token">${esc(token)}</div>
+      <span class="badge ${statusClass(st)}">${esc(prettyStatus(st))}</span>
+      <div class="stats">
+        <div class="stat"><b>${esc(b.booking_date||"—")}</b><small>DATE</small></div>
+        <div class="stat"><b>${esc(b.appointment_time||"—")}</b><small>TIME</small></div>
+        <div class="stat"><b>${esc(shopName(b.shop_id))}</b><small>SHOP</small></div>
+      </div>
+    </div>`;
+}
+function addNotification(title,text){
+  const box=$("notifications");
+  const old=box.innerHTML.includes("No new notifications")?"":box.innerHTML;
+  box.innerHTML=`<div class="queueRow"><div>🔔</div><div><div class="qName">${esc(title)}</div><div class="qMeta">${esc(text)}</div></div><div class="small">Now</div></div>`+old;
+}
+function subscribeToBooking(id){
+  if(bookingChannel) db.removeChannel(bookingChannel);
+  bookingChannel=db.channel("trimd-customer-"+id)
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"trimd_bookings",filter:"id=eq."+id},payload=>{
+      currentBooking=payload.new;
+      showBooking(payload.new);
+      notice("bookingMsg","Booking status updated: "+prettyStatus(payload.new.status));
+      addNotification("Booking updated","Your status is now "+prettyStatus(payload.new.status)+".");
+      if(payload.new.shop_id) loadQueue(payload.new.shop_id);
+    }).subscribe();
+}
+async function restoreBooking(){
+  const saved=localStorage.getItem("trimd_last_booking");
+  if(!saved)return;
+  try{
+    const x=JSON.parse(saved);
+    if(!x.id)return;
+    const {data,error}=await db.from("trimd_bookings").select("*").eq("id",x.id).maybeSingle();
+    if(!error&&data){
+      currentBooking=data; showBooking(data); subscribeToBooking(data.id);
+      if(data.shop_id) loadQueue(data.shop_id);
+    }
+  }catch(e){console.log(e)}
+}
+setDefaultDate();
+window.addEventListener("load",async()=>{await loadShops();await restoreBooking()});
+setInterval(()=>{if(selectedShop)loadQueue(selectedShop.id)},15000);
+</script>
+</body>
+</html>
